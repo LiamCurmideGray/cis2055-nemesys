@@ -1,4 +1,4 @@
-﻿@model IEnumerable<cis2055_NemesysProject.Models.Roles>
+﻿@model IEnumerable<cis2055_NemesysProject.Models.Role>
 
 @{
     ViewData["Title"] = "Index";
@@ -25,9 +25,9 @@
                 @Html.DisplayFor(modelItem => item.RoleType)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Role_ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Role_ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Role_ID">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.RoleId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.RoleId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.RoleId">Delete</a>
             </td>
         </tr>
 }

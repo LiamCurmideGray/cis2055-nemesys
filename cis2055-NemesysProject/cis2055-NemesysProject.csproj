@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>cis2055_NemesysProject</RootNamespace>
+    <UserSecretsId>042a0002-b768-44e6-bf2a-d4b66442e9aa</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
