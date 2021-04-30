@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using cis2055_NemesysProject;
 using cis2055_NemesysProject.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,9 +28,12 @@ namespace cis2055_NemesysProject
         {
             services.AddControllersWithViews();
 
-            services.AddDbContext<NemesysContext>(options =>
+            //services.AddDbContext<NemesysContext>(options =>
+            //options.UseSqlServer(Configuration.GetConnectionString("NemesysContext")));
+
+            services.AddDbContext<cis2055nemesysContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("NemesysContext")));
-            
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

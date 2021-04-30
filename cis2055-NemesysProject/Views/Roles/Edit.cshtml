@@ -1,4 +1,4 @@
-﻿@model cis2055_NemesysProject.Models.Roles
+﻿@model cis2055_NemesysProject.Models.Role
 
 @{
     ViewData["Title"] = "Edit";
@@ -6,13 +6,13 @@
 
 <h1>Edit</h1>
 
-<h4>Roles</h4>
+<h4>Role</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Role_ID" />
+            <input type="hidden" asp-for="RoleId" />
             <div class="form-group">
                 <label asp-for="RoleType" class="control-label"></label>
                 <input asp-for="RoleType" class="form-control" />
