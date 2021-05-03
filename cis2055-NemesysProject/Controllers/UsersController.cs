@@ -7,6 +7,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using cis2055_NemesysProject.Models;
 using cis2055_NemesysProject.Data;
+using cis2055_NemesysProject.Controllers;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using System.Text;
 
 namespace cis2055_NemesysProject.Controllers
 {
@@ -45,25 +49,48 @@ namespace cis2055_NemesysProject.Controllers
             return View(user);
         }
 
-        // GET: Users/Create
-        public IActionResult Create()
+
+        // GET:  Users/Register but without Admin Role
+        public async Task<IActionResult> Register()
         {
-            ViewData["RoleId"] = new SelectList(_context.Roles, "RoleId", "RoleType");
+
+
+            var rolesController = new RolesController(_context);
+
+            var abc = await rolesController.NoAdmin();
+            ViewData["RoleId"] = new SelectList(abc, "RoleId", "RoleType");
+
             return View();
         }
 
-        // POST: Users/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserId,RoleId,Username,Email,Telephone,Password")] User user)
+        public async Task<IActionResult> Register([Bind("UserId,RoleId,Username,Email,Telephone,Password")] User user)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(user);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                //Checking if Email already exists in the Database and returns a User object
+                var userEmail = await _context.Users
+               .FirstOrDefaultAsync(m => m.Email == user.Email);
+
+                //Checks if useremail object is empty
+                if (userEmail == null)
+                { 
+                    user.Password = HashPassword(user);
+                     _context.Add(user);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+
+                }
+                //Checking if Email already exists in the Database
+                else 
+                {
+                    ViewData["RoleId"] = new SelectList(_context.Roles, "RoleId", "RoleType", user.RoleId);
+                    ViewData["EmailExists"] = "A user with that Email Already Exists, try again!";
+                    return View(user);
+                }
+
+
             }
             ViewData["RoleId"] = new SelectList(_context.Roles, "RoleId", "RoleType", user.RoleId);
             return View(user);
@@ -102,6 +129,7 @@ namespace cis2055_NemesysProject.Controllers
             {
                 try
                 {
+                    user.Password = HashPassword(user);
                     _context.Update(user);
                     await _context.SaveChangesAsync();
                 }
@@ -155,6 +183,28 @@ namespace cis2055_NemesysProject.Controllers
         private bool UserExists(int id)
         {
             return _context.Users.Any(e => e.UserId == id);
+        }
+
+
+        //Hashes Password and returns it back
+        private string HashPassword(User user)
+        {
+            byte[] salt = Encoding.ASCII.GetBytes(user.Email);
+            //using (var rng = RandomNumberGenerator.Create())
+            //{
+            //    rng.GetBytes(salt);
+            //}
+
+
+            // derive a 256-bit subkey (use HMACSHA1 with 10,000 iterations)
+            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: user.Password,
+                salt: salt,
+                prf: KeyDerivationPrf.HMACSHA1,
+                iterationCount: 10000,
+                numBytesRequested: 256 / 8));
+
+            return hashed;
         }
     }
 }

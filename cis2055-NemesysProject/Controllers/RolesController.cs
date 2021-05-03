@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using cis2055_NemesysProject.Data;
 using cis2055_NemesysProject.Models;
-
+using System.Collections;
 
 namespace cis2055_NemesysProject.Controllers
 {
@@ -19,6 +19,7 @@ namespace cis2055_NemesysProject.Controllers
         {
             _context = context;
         }
+
 
         // GET: Roles
         public async Task<IActionResult> Index()
@@ -44,6 +45,14 @@ namespace cis2055_NemesysProject.Controllers
             }
 
             return View(role);
+        }
+
+        public async Task<IEnumerable> NoAdmin()
+        {
+            var role = await _context.Roles.ToListAsync();
+            role.Remove(role.FirstOrDefault(m => m.RoleType == "Admin"));
+            return role;
+            
         }
 
         // GET: Roles/Create
