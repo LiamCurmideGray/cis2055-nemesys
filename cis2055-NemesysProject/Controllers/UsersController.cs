@@ -49,6 +49,45 @@ namespace cis2055_NemesysProject.Controllers
             return View(user);
         }
 
+        public ActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public  async Task<IActionResult> Login(User user)
+        {
+            if (ModelState.IsValid)
+            {
+                var dbUser =  EmailExists(user.Email);
+
+                if(dbUser != null)
+                {
+                    user.Password = HashPassword(user.Email, user.Password);
+
+                    if (dbUser.Password == user.Password)
+                    {
+
+                        return RedirectToAction(nameof(Index));
+
+                    } else
+                    {
+                        ViewData["PasswordIncorrect"] = "Password is incorrect, please try again.";
+                        return View(user);
+
+                    }
+
+                } else
+                {
+                    ViewData["EmailNotFound"] = "Could not find email address, try again.";
+                    return View(user);
+                }         
+
+            }
+
+            return View(user.Email, user.Password);
+
+        }
 
         // GET:  Users/Register but without Admin Role
         public async Task<IActionResult> Register()
@@ -76,7 +115,7 @@ namespace cis2055_NemesysProject.Controllers
                 //Checks if useremail object is empty
                 if (userEmail == null)
                 { 
-                    user.Password = HashPassword(user);
+                    user.Password = HashPassword(user.Email, user.Password);
                      _context.Add(user);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
@@ -129,9 +168,9 @@ namespace cis2055_NemesysProject.Controllers
             {
                 try
                 {
-                    user.Password = HashPassword(user);
+                    user.Password = HashPassword(user.Email, user.Password);
                     _context.Update(user);
-                    await _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync   ();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -185,11 +224,16 @@ namespace cis2055_NemesysProject.Controllers
             return _context.Users.Any(e => e.UserId == id);
         }
 
+        private User EmailExists(string email)
+        {
+            return  _context.Users.FirstOrDefault(e => e.Email == email);
+        }
+
 
         //Hashes Password and returns it back
-        private string HashPassword(User user)
+        private string HashPassword(string email, string password)
         {
-            byte[] salt = Encoding.ASCII.GetBytes(user.Email);
+            byte[] salt = Encoding.ASCII.GetBytes(email);
             //using (var rng = RandomNumberGenerator.Create())
             //{
             //    rng.GetBytes(salt);
@@ -198,7 +242,7 @@ namespace cis2055_NemesysProject.Controllers
 
             // derive a 256-bit subkey (use HMACSHA1 with 10,000 iterations)
             string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: user.Password,
+                password: password,
                 salt: salt,
                 prf: KeyDerivationPrf.HMACSHA1,
                 iterationCount: 10000,
