@@ -86,6 +86,7 @@ namespace cis2055_NemesysProject.Controllers
             if (ModelState.IsValid)
             {
                 var dbUser = EmailExists(user.Email);
+
                 if(dbUser != null)
                 {
                     user.Password = HashPassword(user.Email, user.Password);
@@ -120,6 +121,7 @@ namespace cis2055_NemesysProject.Controllers
             HttpContext.SignOutAsync();
 
             return RedirectToAction(nameof(Index));
+
         }
 
         // GET:  Users/Register but without Admin Role
@@ -209,7 +211,7 @@ namespace cis2055_NemesysProject.Controllers
                 {
                     user.Password = HashPassword(user.Email, user.Password);
                     _context.Update(user);
-                    await _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync   ();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -278,7 +280,6 @@ namespace cis2055_NemesysProject.Controllers
 
         private User EmailExists(string email)
         {
-
             return _context.Users
                 .Include(u => u.Role)
                 .FirstOrDefault(e => e.Email == email);
