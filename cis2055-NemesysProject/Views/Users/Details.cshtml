@@ -43,6 +43,20 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.UserId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model.UserId">Edit</a>   |
+
+    @{
+        if (ViewBag.CurrentUser != null)
+        {
+            var user = ViewBag.CurrentUser;
+
+            if (user.Role.RoleType == "Admin")
+            {
+               
+                <a asp-action="Index"> Back to List </a>
+            }
+
+
+        }
+    }
 </div>

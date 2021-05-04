@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using cis2055_NemesysProject;
 using cis2055_NemesysProject.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Session;
 
 namespace cis2055_NemesysProject
 {
@@ -26,10 +27,19 @@ namespace cis2055_NemesysProject
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
 
-            //services.AddDbContext<NemesysContext>(options =>
-            //options.UseSqlServer(Configuration.GetConnectionString("NemesysContext")));
+            //services.AddMvc().AddJsonOptions();
+            services.AddDistributedMemoryCache();
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromHours(1);
+                //options.Cookie.HttpOnly = true;
+                //options.Cookie.Name = "Nemesys COOKIE";
+                //options.Cookie.IsEssential = true;
+            });
+
+            services.AddControllersWithViews();
+           
 
             services.AddDbContext<cis2055nemesysContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("NemesysContext")));
@@ -55,6 +65,9 @@ namespace cis2055_NemesysProject
             app.UseRouting();
 
             app.UseAuthorization();
+
+            //app.UseMvc();
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {

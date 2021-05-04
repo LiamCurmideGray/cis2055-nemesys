@@ -11,6 +11,10 @@ using cis2055_NemesysProject.Controllers;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System.Text;
+using Microsoft.AspNetCore.Http;
+using cis2055_NemesysProject.ViewModel;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Logging;
 
 namespace cis2055_NemesysProject.Controllers
 {
@@ -18,21 +22,43 @@ namespace cis2055_NemesysProject.Controllers
     {
         private readonly cis2055nemesysContext _context;
 
+
+
         public UsersController(cis2055nemesysContext context)
         {
             _context = context;
+
         }
+
+
 
         // GET: Users
         public async Task<IActionResult> Index()
         {
-            var cis2055nemesysContext = _context.Users.Include(u => u.Role);
-            return View(await cis2055nemesysContext.ToListAsync());
+            RetreiveSessionUser();
+
+            var user = ViewBag.CurrentUser;
+
+            if(user != null)
+            {
+                if (user.Role.RoleType == "Admin")
+                {
+                    var cis2055nemesysContext = _context.Users.Include(u => u.Role);
+                    return View(await cis2055nemesysContext.ToListAsync());
+                } else
+                {
+                    return RedirectToAction("Details", new { id = user.UserId});
+
+                }
+            }
+            return RedirectToAction("Index", "Home");
         }
 
         // GET: Users/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            RetreiveSessionUser();
+
             if (id == null)
             {
                 return NotFound();
@@ -49,6 +75,52 @@ namespace cis2055_NemesysProject.Controllers
             return View(user);
         }
 
+        public ActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(User user)
+        {
+            if (ModelState.IsValid)
+            {
+                var dbUser = EmailExists(user.Email);
+                if(dbUser != null)
+                {
+                    user.Password = HashPassword(user.Email, user.Password);
+
+                    if (dbUser.Password == user.Password)
+                    {
+                        HttpContext.Session.SetObjectAsJson("UserLoggedIn", dbUser);
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        ViewData["PasswordIncorrect"] = "Password is incorrect, please try again.";
+                        return View(user);
+                    }
+                }
+                else
+                {
+                    ViewData["EmailNotFound"] = "Could not find email address, try again.";
+                    return View(user);
+                }
+            }
+            return View(user.Email, user.Password);
+        }
+
+        public IActionResult Logout()
+        {
+            //Removes Session Called
+            HttpContext.Session.Remove("UserLoggedIn");
+
+            //Removes All Sessions currently Stored.
+            HttpContext.Session.Clear();
+            HttpContext.SignOutAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
 
         // GET:  Users/Register but without Admin Role
         public async Task<IActionResult> Register()
@@ -76,14 +148,17 @@ namespace cis2055_NemesysProject.Controllers
                 //Checks if useremail object is empty
                 if (userEmail == null)
                 { 
-                    user.Password = HashPassword(user);
+                    user.Password = HashPassword(user.Email, user.Password);
                      _context.Add(user);
                     await _context.SaveChangesAsync();
+
+                    user = EmailExists(user.Email);
+                    HttpContext.Session.SetObjectAsJson("UserLoggedIn", user);
                     return RedirectToAction(nameof(Index));
 
                 }
                 //Checking if Email already exists in the Database
-                else 
+                else
                 {
                     ViewData["RoleId"] = new SelectList(_context.Roles, "RoleId", "RoleType", user.RoleId);
                     ViewData["EmailExists"] = "A user with that Email Already Exists, try again!";
@@ -99,10 +174,13 @@ namespace cis2055_NemesysProject.Controllers
         // GET: Users/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            RetreiveSessionUser();
+
             if (id == null)
             {
                 return NotFound();
             }
+
 
             var user = await _context.Users.FindAsync(id);
             if (user == null)
@@ -129,7 +207,7 @@ namespace cis2055_NemesysProject.Controllers
             {
                 try
                 {
-                    user.Password = HashPassword(user);
+                    user.Password = HashPassword(user.Email, user.Password);
                     _context.Update(user);
                     await _context.SaveChangesAsync();
                 }
@@ -153,6 +231,8 @@ namespace cis2055_NemesysProject.Controllers
         // GET: Users/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            RetreiveSessionUser();
+
             if (id == null)
             {
                 return NotFound();
@@ -180,25 +260,38 @@ namespace cis2055_NemesysProject.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
+        /// <summary>
+        /// Methods that don't have direct interaction with the views
+        /// </summary>
+
         private bool UserExists(int id)
         {
             return _context.Users.Any(e => e.UserId == id);
         }
 
+        public void RetreiveSessionUser()
+        {
+            User currentUser = HttpContext.Session.GetObjectFromJson<User>("UserLoggedIn");
+            ViewBag.CurrentUser = currentUser;
+        }
+
+        private User EmailExists(string email)
+        {
+
+            return _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefault(e => e.Email == email);
+        }
 
         //Hashes Password and returns it back
-        private string HashPassword(User user)
+        private string HashPassword(string Email, string Password)
         {
-            byte[] salt = Encoding.ASCII.GetBytes(user.Email);
-            //using (var rng = RandomNumberGenerator.Create())
-            //{
-            //    rng.GetBytes(salt);
-            //}
-
-
+            byte[] salt = Encoding.ASCII.GetBytes(Email);
+          
             // derive a 256-bit subkey (use HMACSHA1 with 10,000 iterations)
             string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: user.Password,
+                password: Password,
                 salt: salt,
                 prf: KeyDerivationPrf.HMACSHA1,
                 iterationCount: 10000,
