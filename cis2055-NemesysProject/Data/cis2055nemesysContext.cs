@@ -20,7 +20,7 @@ namespace cis2055_NemesysProject.Data
         public virtual DbSet<Hazard> Hazards { get; set; }
         public virtual DbSet<Investigation> Investigations { get; set; }
         public virtual DbSet<LogInvestigation> LogInvestigations { get; set; }
-        public virtual DbSet<Pinpoint> Pinpoints { get; set; }
+        //public virtual DbSet<Pinpoint> Pinpoints { get; set; }
         public virtual DbSet<Report> Reports { get; set; }
         public virtual DbSet<ReportHazard> ReportHazards { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
@@ -92,10 +92,7 @@ namespace cis2055_NemesysProject.Data
                     .HasConstraintName("FK_LogInvestigations_Investigations");
             });
 
-            modelBuilder.Entity<Pinpoint>(entity =>
-            {
-                entity.Property(e => e.PinpointId).HasColumnName("Pinpoint_ID");
-            });
+
 
             modelBuilder.Entity<Report>(entity =>
             {
@@ -111,15 +108,21 @@ namespace cis2055_NemesysProject.Data
 
                 entity.Property(e => e.Image).HasColumnType("image");
 
-                entity.Property(e => e.PinpointId).HasColumnName("Pinpoint_ID");
+
+                entity.Property(e => e.Latitude).HasColumnType("float");
+                entity.Property(e => e.Longitude).HasColumnType("float");
+
+
+
+                //entity.Property(e => e.PinpointId).HasColumnName("Pinpoint_ID");
 
                 entity.Property(e => e.UserId).HasColumnName("User_ID");
 
-                entity.HasOne(d => d.Pinpoint)
-                    .WithMany(p => p.Reports)
-                    .HasForeignKey(d => d.PinpointId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Reports_Pinpoints");
+                //entity.HasOne(d => d.Pinpoint)
+                //    .WithMany(p => p.Reports)
+                //    .HasForeignKey(d => d.PinpointId)
+                //    .OnDelete(DeleteBehavior.ClientSetNull)
+                //    .HasConstraintName("FK_Reports_Pinpoints");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Reports)
