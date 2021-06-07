@@ -22,7 +22,7 @@ namespace cis2055_NemesysProject.Controllers
         // GET: Reports
         public async Task<IActionResult> Index()
         {
-            var cis2055nemesysContext = _context.Reports.Include(r => r.Pinpoint).Include(r => r.User);
+            var cis2055nemesysContext = _context.Reports.Include(r => r.User);
             return View(await cis2055nemesysContext.ToListAsync());
         }
 
@@ -35,7 +35,6 @@ namespace cis2055_NemesysProject.Controllers
             }
 
             var report = await _context.Reports
-                .Include(r => r.Pinpoint)
                 .Include(r => r.User)
                 .FirstOrDefaultAsync(m => m.ReportId == id);
             if (report == null)
@@ -49,7 +48,6 @@ namespace cis2055_NemesysProject.Controllers
         // GET: Reports/Create
         public IActionResult Create()
         {
-            ViewData["PinpointId"] = new SelectList(_context.Pinpoints, "PinpointId", "PinpointId");
             ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email");
             return View();
         }
@@ -59,7 +57,7 @@ namespace cis2055_NemesysProject.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ReportId,UserId,PinpointId,DateOfReport,DateTimeHazard,Description,Upvotes,Image")] Report report)
+        public async Task<IActionResult> Create([Bind("ReportId,UserId,DateOfReport,DateTimeHazard,Description,Upvotes,Image,Latitude,Longitude")] Report report)
         {
             if (ModelState.IsValid)
             {
@@ -67,7 +65,6 @@ namespace cis2055_NemesysProject.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PinpointId"] = new SelectList(_context.Pinpoints, "PinpointId", "PinpointId", report.PinpointId);
             ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email", report.UserId);
             return View(report);
         }
@@ -85,7 +82,6 @@ namespace cis2055_NemesysProject.Controllers
             {
                 return NotFound();
             }
-            ViewData["PinpointId"] = new SelectList(_context.Pinpoints, "PinpointId", "PinpointId", report.PinpointId);
             ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email", report.UserId);
             return View(report);
         }
@@ -95,7 +91,7 @@ namespace cis2055_NemesysProject.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ReportId,UserId,PinpointId,DateOfReport,DateTimeHazard,Description,Upvotes,Image")] Report report)
+        public async Task<IActionResult> Edit(int id, [Bind("ReportId,UserId,DateOfReport,DateTimeHazard,Description,Upvotes,Image,Latitude,Longitude")] Report report)
         {
             if (id != report.ReportId)
             {
@@ -122,7 +118,6 @@ namespace cis2055_NemesysProject.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PinpointId"] = new SelectList(_context.Pinpoints, "PinpointId", "PinpointId", report.PinpointId);
             ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email", report.UserId);
             return View(report);
         }
@@ -136,7 +131,6 @@ namespace cis2055_NemesysProject.Controllers
             }
 
             var report = await _context.Reports
-                .Include(r => r.Pinpoint)
                 .Include(r => r.User)
                 .FirstOrDefaultAsync(m => m.ReportId == id);
             if (report == null)

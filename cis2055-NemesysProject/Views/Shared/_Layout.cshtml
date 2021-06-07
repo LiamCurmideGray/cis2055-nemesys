@@ -21,7 +21,7 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                      
+
                         @{
                             if (ViewBag.CurrentUser != null)
                             {
@@ -32,6 +32,31 @@
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Logout">Logout</a>
                                 </li>
+
+                                if (user.Role.RoleType.Equals("Admin"))
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users Index</a>
+                                    </li>
+                                }
+
+                                if (user.Role.RoleType.Equals("Admin") || user.Role.RoleType.Equals("Investigator"))
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Investigations" asp-action="Index">Investigations</a>
+                                    </li>
+
+                                }
+
+                                if (user.Role.RoleType.Equals("Admin") || user.Role.RoleType.Equals("Reporter"))
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Reports" asp-action="Index">Reports</a>
+                                    </li>
+
+                                }
+
+
                             }
                             else
                             {
