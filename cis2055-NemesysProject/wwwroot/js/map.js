@@ -29,7 +29,8 @@ function addPinpoint(map, mapsMouseEvent) {
                 pinpoint.setMap(null);
             }
         }
-        document.getElementById('latlng').innerHTML = null;
+        document.getElementById("Latitude").value = null;
+        document.getElementById("Longitude").value = null;
     });
 
     map.addListener("click", (mapsMouseEvent) => {
@@ -51,6 +52,8 @@ function addPinpoint(map, mapsMouseEvent) {
         pinpoint.setMap(map);
     }
 
-    var latlng = mapsMouseEvent.latLng;
-    document.getElementById('latlng').innerHTML = latlng;
+    var lat = mapsMouseEvent.latLng.lat();
+    var lng = mapsMouseEvent.latLng.lng();
+    document.getElementById("Latitude").value = lat;
+    document.getElementById("Longitude").value = lng;
 }

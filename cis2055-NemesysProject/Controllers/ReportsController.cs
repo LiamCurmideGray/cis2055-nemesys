@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using cis2055_NemesysProject.Data;
 using cis2055_NemesysProject.Models;
+using cis2055_NemesysProject.ViewModel;
+using System.IO;
 
 namespace cis2055_NemesysProject.Controllers
 {
@@ -49,7 +51,8 @@ namespace cis2055_NemesysProject.Controllers
         public IActionResult Create()
         {
             ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email");
-            return View();
+            var model = new CreateReportViewModel();
+            return View(model);
         }
 
         // POST: Reports/Create
@@ -57,11 +60,35 @@ namespace cis2055_NemesysProject.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ReportId,UserId,DateOfReport,DateTimeHazard,Description,Upvotes,Image,Latitude,Longitude")] Report report)
+        public async Task<IActionResult> Create([Bind("UserId,DateTimeHazard,Description,ImageToUpload,Latitude,Longitude")] CreateReportViewModel report)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(report);
+                string fileName = "";
+                if (report.ImageToUpload != null)
+                {
+                    
+                    var extension = "." + report.ImageToUpload.FileName.Split('.')[report.ImageToUpload.FileName.Split('.').Length - 1];
+                    fileName = Guid.NewGuid().ToString() + extension;
+                    var path = Directory.GetCurrentDirectory() + "\\wwwroot\\images\\reports\\" + fileName;
+                    using (var bits = new FileStream(path, FileMode.Create))
+                    {
+                        report.ImageToUpload.CopyTo(bits);
+                    }
+                }
+
+                Report newReport = new Report()
+                {
+                    UserId = report.UserId,
+                    DateOfReport = DateTime.UtcNow,
+                    DateTimeHazard = report.DateTimeHazard,
+                    Description = report.Description,
+                    Upvotes = 0,
+                    Image = "/images/reports/" + fileName,
+                    Longitude = report.Longitude,
+                    Latitude = report.Latitude
+                };
+                _context.Add(newReport);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }

@@ -1,4 +1,4 @@
-﻿@model cis2055_NemesysProject.Models.Report
+﻿@model cis2055_NemesysProject.ViewModel.CreateReportViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -10,19 +10,15 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" method="post" role="form" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="UserId" class="control-label"></label>
-                <select asp-for="UserId" class ="form-control" asp-items="ViewBag.UserId"></select>
+                <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
             </div>
+
             <div class="form-group">
-                <label asp-for="DateOfReport" class="control-label"></label>
-                <input asp-for="DateOfReport" class="form-control" />
-                <span asp-validation-for="DateOfReport" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DateTimeHazard" class="control-label"></label>
+                <label asp-for="DateTimeHazard" class="control-label">Date and time hazard was spotted</label>
                 <input asp-for="DateTimeHazard" class="form-control" />
                 <span asp-validation-for="DateTimeHazard" class="text-danger"></span>
             </div>
@@ -31,15 +27,11 @@
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="Upvotes" class="control-label"></label>
-                <input asp-for="Upvotes" class="form-control" />
-                <span asp-validation-for="Upvotes" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Image" class="control-label"></label>
-                <input asp-for="Image" class="form-control" />
-                <span asp-validation-for="Image" class="text-danger"></span>
+                <label asp-for="ImageToUpload" class="control-label"></label>
+                <input type="file" asp-for="ImageToUpload" class="form-control" />
+                <span asp-validation-for="ImageToUpload" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Latitude" class="control-label"></label>
@@ -51,6 +43,14 @@
                 <input asp-for="Longitude" class="form-control" />
                 <span asp-validation-for="Longitude" class="text-danger"></span>
             </div>
+
+            <div id="map"></div>
+
+            <link rel="stylesheet" href="~/css/map.css">
+            <script src="~/js/map.js"></script>
+            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyChmvdq02aq8Sa68jTYFghQZz_1LFFUp8o&callback=initMap&libraries=&v=weekly"
+                    async></script>
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>

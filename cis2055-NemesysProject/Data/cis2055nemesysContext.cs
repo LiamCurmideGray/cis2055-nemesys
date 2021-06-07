@@ -106,7 +106,7 @@ namespace cis2055_NemesysProject.Data
                     .IsRequired()
                     .HasColumnType("ntext");
 
-                entity.Property(e => e.Image).HasColumnType("image");
+                entity.Property(e => e.Image).HasColumnName("Image");
 
 
                 entity.Property(e => e.Latitude).HasColumnType("float");
