@@ -12,7 +12,7 @@ namespace cis2055_NemesysProject.Models
             ReportHazards = new HashSet<ReportHazard>();
         }
 
-        public int HarzardId { get; set; }
+        public int HazardId { get; set; }
         public string HazardType { get; set; }
 
         public virtual ICollection<ReportHazard> ReportHazards { get; set; }

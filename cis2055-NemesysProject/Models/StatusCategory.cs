@@ -9,12 +9,12 @@ namespace cis2055_NemesysProject.Models
     {
         public StatusCategory()
         {
-            Investigations = new HashSet<Investigation>();
+            Reports = new HashSet<Report>();
         }
 
         public int StatusId { get; set; }
         public string StatusType { get; set; }
 
-        public virtual ICollection<Investigation> Investigations { get; set; }
+        public virtual ICollection<Report> Reports { get; set; }
     }
 }
