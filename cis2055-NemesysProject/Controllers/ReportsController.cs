@@ -51,7 +51,13 @@ namespace cis2055_NemesysProject.Controllers
         public IActionResult Create()
         {
             ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email");
-            var model = new CreateReportViewModel();
+            ViewData["HazardId"] = new SelectList(_context.Hazards, "HazardId", "HazardType");
+            var hazards = _context.Hazards.ToList();
+
+            var model = new CreateReportViewModel()
+            {
+                HazardList = hazards
+            };
             return View(model);
         }
 
@@ -60,7 +66,7 @@ namespace cis2055_NemesysProject.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserId,DateTimeHazard,Description,ImageToUpload,Latitude,Longitude")] CreateReportViewModel report)
+        public async Task<IActionResult> Create([Bind("UserId,HazardId,DateTimeHazard,Description,ImageToUpload,Latitude,Longitude")] CreateReportViewModel report)
         {
             if (ModelState.IsValid)
             {
@@ -86,14 +92,34 @@ namespace cis2055_NemesysProject.Controllers
                     Upvotes = 0,
                     Image = "/images/reports/" + fileName,
                     Longitude = report.Longitude,
-                    Latitude = report.Latitude
+                    Latitude = report.Latitude,
+                    StatusId = 1
                 };
                 _context.Add(newReport);
                 await _context.SaveChangesAsync();
+
+                // can be modified to support many to many like in database
+                Report reportObj = _context.Reports.OrderBy(r => r.ReportId).Last();
+                ReportHazard reportHazard = new ReportHazard()
+                {
+                    HazardId = (int)report.HazardId,
+                    ReportId = reportObj.ReportId
+                };
+                _context.Add(reportHazard);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email", report.UserId);
-            return View(report);
+            else
+            {
+                ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email");
+                var hazards = _context.Hazards.ToList();
+
+                var model = new CreateReportViewModel()
+                {
+                    HazardList = hazards
+                };
+                return View(model);
+            }
         }
 
         // GET: Reports/Edit/5
@@ -173,6 +199,13 @@ namespace cis2055_NemesysProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            List<ReportHazard> reportHazards = _context.ReportHazards.Where(e => e.ReportId == id).ToList();
+
+            foreach (var item in reportHazards)
+            {
+                _context.Remove(item);
+            }
+
             var report = await _context.Reports.FindAsync(id);
             _context.Reports.Remove(report);
             await _context.SaveChangesAsync();

@@ -24,6 +24,9 @@ namespace cis2055_NemesysProject.Models
 
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+        public int StatusId { get; set; }
+
+        public virtual StatusCategory Status { get; set; }
 
         //public virtual Pinpoint Pinpoint { get; set; }
         public virtual User User { get; set; }

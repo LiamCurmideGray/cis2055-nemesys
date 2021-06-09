@@ -34,7 +34,7 @@ namespace cis2055_NemesysProject.Controllers
             }
 
             var hazard = await _context.Hazards
-                .FirstOrDefaultAsync(m => m.HarzardId == id);
+                .FirstOrDefaultAsync(m => m.HazardId == id);
             if (hazard == null)
             {
                 return NotFound();
@@ -88,7 +88,7 @@ namespace cis2055_NemesysProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("HarzardId,HazardType")] Hazard hazard)
         {
-            if (id != hazard.HarzardId)
+            if (id != hazard.HazardId)
             {
                 return NotFound();
             }
@@ -102,7 +102,7 @@ namespace cis2055_NemesysProject.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!HazardExists(hazard.HarzardId))
+                    if (!HazardExists(hazard.HazardId))
                     {
                         return NotFound();
                     }
@@ -125,7 +125,7 @@ namespace cis2055_NemesysProject.Controllers
             }
 
             var hazard = await _context.Hazards
-                .FirstOrDefaultAsync(m => m.HarzardId == id);
+                .FirstOrDefaultAsync(m => m.HazardId == id);
             if (hazard == null)
             {
                 return NotFound();
@@ -147,7 +147,7 @@ namespace cis2055_NemesysProject.Controllers
 
         private bool HazardExists(int id)
         {
-            return _context.Hazards.Any(e => e.HarzardId == id);
+            return _context.Hazards.Any(e => e.HazardId == id);
         }
     }
 }
