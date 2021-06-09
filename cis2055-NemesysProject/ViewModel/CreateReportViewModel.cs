@@ -10,6 +10,7 @@ namespace cis2055_NemesysProject.ViewModel
 {
     public class CreateReportViewModel
     {
+        public int ReportId { get; set; }
         public int UserId { get; set; }
         [Display(Name = "Hazard Type")]
         [Required(ErrorMessage = "Hazard type must be selected")]
@@ -27,12 +28,12 @@ namespace cis2055_NemesysProject.ViewModel
 
         [Display(Name = "Hazard Image")]
         public IFormFile ImageToUpload { get; set; }
-        [Required]
+        [Required (ErrorMessage = "Please place a marker on the map or input latitude")]
         [Range (-90, 90, ErrorMessage = "Latitude has to be between -90 and 90")]
-        public double Latitude { get; set; }
-        [Required]
+        public double? Latitude { get; set; }
+        [Required(ErrorMessage = "Please place a marker on the map or input longitude")]
         [Range(-180, 180, ErrorMessage = "Longitude has to be between -180 and 180")]
-        public double Longitude { get; set; }
+        public double? Longitude { get; set; }
 
         public List<Hazard> HazardList { get; set; }
     }
