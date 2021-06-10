@@ -22,7 +22,7 @@ namespace cis2055_NemesysProject.Controllers
         // GET: Investigations
         public async Task<IActionResult> Index()
         {
-            var cis2055nemesysContext = _context.Investigations.Include(i => i.Report).Include(i => i.Status).Include(i => i.User);
+            var cis2055nemesysContext = _context.Investigations.Include(i => i.Report).Include(i => i.User);
             return View(await cis2055nemesysContext.ToListAsync());
         }
 
@@ -36,7 +36,6 @@ namespace cis2055_NemesysProject.Controllers
 
             var investigation = await _context.Investigations
                 .Include(i => i.Report)
-                .Include(i => i.Status)
                 .Include(i => i.User)
                 .FirstOrDefaultAsync(m => m.InvestigationId == id);
             if (investigation == null)
@@ -51,7 +50,6 @@ namespace cis2055_NemesysProject.Controllers
         public IActionResult Create()
         {
             ViewData["ReportId"] = new SelectList(_context.Reports, "ReportId", "Description");
-            ViewData["StatusId"] = new SelectList(_context.StatusCategories, "StatusId", "StatusType");
             ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email");
             return View();
         }
@@ -61,7 +59,7 @@ namespace cis2055_NemesysProject.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("InvestigationId,UserId,ReportId,StatusId")] Investigation investigation)
+        public async Task<IActionResult> Create([Bind("InvestigationId,UserId,ReportId")] Investigation investigation)
         {
             if (ModelState.IsValid)
             {
@@ -70,7 +68,6 @@ namespace cis2055_NemesysProject.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ReportId"] = new SelectList(_context.Reports, "ReportId", "Description", investigation.ReportId);
-            ViewData["StatusId"] = new SelectList(_context.StatusCategories, "StatusId", "StatusType", investigation.StatusId);
             ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email", investigation.UserId);
             return View(investigation);
         }
@@ -89,7 +86,6 @@ namespace cis2055_NemesysProject.Controllers
                 return NotFound();
             }
             ViewData["ReportId"] = new SelectList(_context.Reports, "ReportId", "Description", investigation.ReportId);
-            ViewData["StatusId"] = new SelectList(_context.StatusCategories, "StatusId", "StatusType", investigation.StatusId);
             ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email", investigation.UserId);
             return View(investigation);
         }
@@ -99,7 +95,7 @@ namespace cis2055_NemesysProject.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("InvestigationId,UserId,ReportId,StatusId")] Investigation investigation)
+        public async Task<IActionResult> Edit(int id, [Bind("InvestigationId,UserId,ReportId")] Investigation investigation)
         {
             if (id != investigation.InvestigationId)
             {
@@ -127,7 +123,6 @@ namespace cis2055_NemesysProject.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ReportId"] = new SelectList(_context.Reports, "ReportId", "Description", investigation.ReportId);
-            ViewData["StatusId"] = new SelectList(_context.StatusCategories, "StatusId", "StatusType", investigation.StatusId);
             ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email", investigation.UserId);
             return View(investigation);
         }
@@ -142,7 +137,6 @@ namespace cis2055_NemesysProject.Controllers
 
             var investigation = await _context.Investigations
                 .Include(i => i.Report)
-                .Include(i => i.Status)
                 .Include(i => i.User)
                 .FirstOrDefaultAsync(m => m.InvestigationId == id);
             if (investigation == null)

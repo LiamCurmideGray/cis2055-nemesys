@@ -36,13 +36,12 @@ namespace cis2055_NemesysProject
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromHours(1);
-                //options.Cookie.HttpOnly = true;
-                //options.Cookie.Name = "Nemesys COOKIE";
-                //options.Cookie.IsEssential = true;
             });
 
+            services.AddDbContext<cis2055nemesysContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("NemesysContext")));
             services.AddControllersWithViews();
-           
+            services.AddRazorPages();
 
             services.AddDbContext<cis2055nemesysContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("NemesysContext")));

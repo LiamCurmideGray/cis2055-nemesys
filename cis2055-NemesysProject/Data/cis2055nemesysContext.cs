@@ -21,7 +21,7 @@ namespace cis2055_NemesysProject.Data
         public virtual DbSet<Hazard> Hazards { get; set; }
         public virtual DbSet<Investigation> Investigations { get; set; }
         public virtual DbSet<LogInvestigation> LogInvestigations { get; set; }
-        public virtual DbSet<Pinpoint> Pinpoints { get; set; }
+        //public virtual DbSet<Pinpoint> Pinpoints { get; set; }
         public virtual DbSet<Report> Reports { get; set; }
         public virtual DbSet<ReportHazard> ReportHazards { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
@@ -36,9 +36,9 @@ namespace cis2055_NemesysProject.Data
 
             modelBuilder.Entity<Hazard>(entity =>
             {
-                entity.HasKey(e => e.HarzardId);
+                entity.HasKey(e => e.HazardId);
 
-                entity.Property(e => e.HarzardId).HasColumnName("Harzard_ID");
+                entity.Property(e => e.HazardId).HasColumnName("Harzard_ID");
 
                 entity.Property(e => e.HazardType)
                     .IsRequired()
@@ -52,8 +52,6 @@ namespace cis2055_NemesysProject.Data
 
                 entity.Property(e => e.ReportId).HasColumnName("Report_ID");
 
-                entity.Property(e => e.StatusId).HasColumnName("Status_ID");
-
                 entity.Property(e => e.UserId).HasColumnName("User_ID");
 
                 entity.HasOne(d => d.Report)
@@ -62,11 +60,6 @@ namespace cis2055_NemesysProject.Data
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Investigations_Reports");
 
-                entity.HasOne(d => d.Status)
-                    .WithMany(p => p.Investigations)
-                    .HasForeignKey(d => d.StatusId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Investigations_StatusCategory");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Investigations)
@@ -94,40 +87,51 @@ namespace cis2055_NemesysProject.Data
                     .HasConstraintName("FK_LogInvestigations_Investigations");
             });
 
-            modelBuilder.Entity<Pinpoint>(entity =>
-            {
-                entity.Property(e => e.PinpointId).HasColumnName("Pinpoint_ID");
-            });
+
 
             modelBuilder.Entity<Report>(entity =>
             {
                 entity.Property(e => e.ReportId).HasColumnName("Report_ID");
 
-                entity.Property(e => e.DateOfReport).HasColumnType("date");
+                entity.Property(e => e.DateOfReport).HasColumnType("smalldatetime");
 
-                entity.Property(e => e.DateTimeHazard).HasColumnType("date");
+                entity.Property(e => e.DateTimeHazard).HasColumnType("smalldatetime");
+
+                entity.Property(e => e.StatusId).HasColumnName("Status_ID");
 
                 entity.Property(e => e.Description)
                     .IsRequired()
                     .HasColumnType("ntext");
 
-                entity.Property(e => e.Image).HasColumnType("image");
+                entity.Property(e => e.Image).HasColumnName("Image");
 
-                entity.Property(e => e.PinpointId).HasColumnName("Pinpoint_ID");
+
+                entity.Property(e => e.Latitude).HasColumnType("float");
+                entity.Property(e => e.Longitude).HasColumnType("float");
+
+
+
+                //entity.Property(e => e.PinpointId).HasColumnName("Pinpoint_ID");
 
                 entity.Property(e => e.UserId).HasColumnName("User_ID");
 
-                entity.HasOne(d => d.Pinpoint)
-                    .WithMany(p => p.Reports)
-                    .HasForeignKey(d => d.PinpointId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Reports_Pinpoints");
+                //entity.HasOne(d => d.Pinpoint)
+                //    .WithMany(p => p.Reports)
+                //    .HasForeignKey(d => d.PinpointId)
+                //    .OnDelete(DeleteBehavior.ClientSetNull)
+                //    .HasConstraintName("FK_Reports_Pinpoints");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Reports)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Reports_Users");
+
+                entity.HasOne(d => d.Status)
+                    .WithMany(p => p.Reports)
+                    .HasForeignKey(d => d.StatusId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Reports_StatusCategory");
             });
 
             modelBuilder.Entity<ReportHazard>(entity =>

@@ -1,7 +1,11 @@
 ﻿let map;
 var pinpoints = [];
+var latitude = parseFloat(document.getElementById("Latitude").value);
+var longitude = parseFloat(document.getElementById("Longitude").value);
+console.log(latitude);
 
 function initMap() {
+    const myLatLng = { lat: latitude, lng: longitude };
     map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 35.9375, lng: 14.3754 },
         zoom: 11,
@@ -9,9 +13,20 @@ function initMap() {
             gestureHandling: 'greedy'
         }
     });
-
+    console.log(myLatLng);
+    var originalPoint = new google.maps.Marker({
+        position: myLatLng,
+        map,
+        title: "Original hazard pinpoint",
+    });
     map.addListener("click", (mapsMouseEvent) => {
+        originalPoint.setMap(null);
         addPinpoint(map, mapsMouseEvent)
+    });
+    originalPoint.addListener("rightclick", function () {
+        originalPoint.setMap(null);
+        document.getElementById("Latitude").value = null;
+        document.getElementById("Longitude").value = null;
     });
 }
 

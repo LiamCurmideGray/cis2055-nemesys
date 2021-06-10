@@ -89,16 +89,26 @@ namespace cis2055_NemesysProject.Controllers
 
                 if(dbUser != null)
                 {
-                    user.Password = HashPassword(user.Email, user.Password);
-
-                    if (dbUser.Password == user.Password)
+                    if(user.Password != null)
                     {
-                        HttpContext.Session.SetObjectAsJson("UserLoggedIn", dbUser);
-                        return RedirectToAction(nameof(Index));
+                        user.Password = HashPassword(user.Email, user.Password);
+
+                        if (dbUser.Password == user.Password)
+                        {
+                            HttpContext.Session.SetObjectAsJson("UserLoggedIn", dbUser);
+                            return RedirectToAction(nameof(Index));
+                        }
+
+                        else
+                        {
+                            ViewData["PasswordIncorrect"] = "Password is incorrect, please try again.";
+                            return View(user);
+                        }
                     }
+                   
                     else
                     {
-                        ViewData["PasswordIncorrect"] = "Password is incorrect, please try again.";
+                        ViewData["NoPassword"] = "No Password found, please try again.";
                         return View(user);
                     }
                 }
@@ -275,7 +285,11 @@ namespace cis2055_NemesysProject.Controllers
         public void RetreiveSessionUser()
         {
             User currentUser = HttpContext.Session.GetObjectFromJson<User>("UserLoggedIn");
-            ViewBag.CurrentUser = currentUser;
+            if(currentUser != null)
+            {
+                ViewBag.CurrentUser = currentUser;
+            }
+            
         }
 
         private User EmailExists(string email)
@@ -286,6 +300,7 @@ namespace cis2055_NemesysProject.Controllers
         }
 
         //Hashes Password and returns it back
+        //Reference from microsoft hash passsword put LINKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
         private string HashPassword(string Email, string Password)
         {
             byte[] salt = Encoding.ASCII.GetBytes(Email);
