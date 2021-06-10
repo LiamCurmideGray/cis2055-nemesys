@@ -10,8 +10,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using cis2055_NemesysProject;
 using cis2055_NemesysProject.Data;
+using cis2055_NemesysProject.Data.Interfaces;
+using cis2055_NemesysProject.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Session;
+using Microsoft.AspNetCore.Identity;
 
 namespace cis2055_NemesysProject
 {
@@ -42,7 +45,16 @@ namespace cis2055_NemesysProject
            
 
             services.AddDbContext<cis2055nemesysContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("NemesysContext")));
+                options.UseSqlServer(Configuration.GetConnectionString("NemesysContext")));
+
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<cis2055nemesysContext>();
+
+            services.AddTransient<IStatusCategoryRepository, StatusCategoryRepository>();
+
+            services.AddControllersWithViews(); //cannot find it .AddRazorRuntimeCompilation();
+            services.AddRazorPages();
+
 
         }
 
@@ -60,11 +72,13 @@ namespace cis2055_NemesysProject
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
+            app.UseStatusCodePages();
             app.UseStaticFiles();
 
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseAuthentication();
 
             //app.UseMvc();
             app.UseSession();
@@ -74,6 +88,8 @@ namespace cis2055_NemesysProject
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                endpoints.MapRazorPages();
             });
         }
     }

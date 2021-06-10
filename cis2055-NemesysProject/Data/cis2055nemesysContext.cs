@@ -2,11 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using cis2055_NemesysProject.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 #nullable disable
 
 namespace cis2055_NemesysProject.Data
 {
-    public partial class cis2055nemesysContext : DbContext
+    public partial class cis2055nemesysContext : IdentityDbContext
     {
         public cis2055nemesysContext()
         {
@@ -30,6 +31,7 @@ namespace cis2055_NemesysProject.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
 
             modelBuilder.Entity<Hazard>(entity =>
