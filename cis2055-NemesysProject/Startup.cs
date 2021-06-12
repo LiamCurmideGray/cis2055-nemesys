@@ -31,7 +31,7 @@ namespace cis2055_NemesysProject
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddScoped<INemesysRepository, NemesysRepository>();
             //services.AddMvc().AddJsonOptions();
             //services.AddDistributedMemoryCache();
             //services.AddSession(options =>
@@ -39,7 +39,7 @@ namespace cis2055_NemesysProject
             //    options.IdleTimeout = TimeSpan.FromHours(1);
             //});
 
- 
+
             services.AddDbContext<cis2055nemesysContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("NemesysContext")));
 

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using cis2055_NemesysProject.Data;
 
 namespace cis2055_NemesysProject.Migrations
 {
     [DbContext(typeof(cis2055nemesysContext))]
-    partial class cis2055nemesysContextModelSnapshot : ModelSnapshot
+    [Migration("20210612220802_Removed_ReportHazards")]
+    partial class Removed_ReportHazards
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
