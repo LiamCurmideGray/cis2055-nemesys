@@ -2,18 +2,16 @@
 var pinpoints = [];
 var latitude = parseFloat(document.getElementById("Latitude").value);
 var longitude = parseFloat(document.getElementById("Longitude").value);
-console.log(latitude);
 
 function initMap() {
     const myLatLng = { lat: latitude, lng: longitude };
     map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 35.9375, lng: 14.3754 },
-        zoom: 11,
+        center: { lat: latitude, lng: longitude },
+        zoom: 17,
         options: {
             gestureHandling: 'greedy'
         }
     });
-    console.log(myLatLng);
     var originalPoint = new google.maps.Marker({
         position: myLatLng,
         map,

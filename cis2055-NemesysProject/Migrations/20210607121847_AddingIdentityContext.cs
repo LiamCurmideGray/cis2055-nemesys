@@ -50,13 +50,13 @@ namespace cis2055_NemesysProject.Migrations
                 name: "Hazards",
                 columns: table => new
                 {
-                    Harzard_ID = table.Column<int>(type: "int", nullable: false)
+                    Hazard_ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     HazardType = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Hazards", x => x.Harzard_ID);
+                    table.PrimaryKey("PK_Hazards", x => x.Hazard_ID);
                 });
 
             migrationBuilder.CreateTable(
@@ -287,7 +287,7 @@ namespace cis2055_NemesysProject.Migrations
                         name: "FK_ReportHazard_Hazard",
                         column: x => x.Hazard_ID,
                         principalTable: "Hazards",
-                        principalColumn: "Harzard_ID",
+                        principalColumn: "Hazard_ID",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ReportHazard_Reports",

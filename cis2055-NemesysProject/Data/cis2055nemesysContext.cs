@@ -38,7 +38,7 @@ namespace cis2055_NemesysProject.Data
             {
                 entity.HasKey(e => e.HazardId);
 
-                entity.Property(e => e.HazardId).HasColumnName("Harzard_ID");
+                entity.Property(e => e.HazardId).HasColumnName("Hazard_ID");
 
                 entity.Property(e => e.HazardType)
                     .IsRequired()
@@ -114,12 +114,19 @@ namespace cis2055_NemesysProject.Data
                 //entity.Property(e => e.PinpointId).HasColumnName("Pinpoint_ID");
 
                 entity.Property(e => e.UserId).HasColumnName("User_ID");
+                
+                entity.Property(e => e.HazardId).HasColumnName("Hazard_ID");
 
                 //entity.HasOne(d => d.Pinpoint)
                 //    .WithMany(p => p.Reports)
                 //    .HasForeignKey(d => d.PinpointId)
                 //    .OnDelete(DeleteBehavior.ClientSetNull)
                 //    .HasConstraintName("FK_Reports_Pinpoints");
+                entity.HasOne(d => d.Hazard)
+                    .WithMany(p => p.Reports)
+                    .HasForeignKey(d => d.HazardId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Reports_Hazards");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Reports)
