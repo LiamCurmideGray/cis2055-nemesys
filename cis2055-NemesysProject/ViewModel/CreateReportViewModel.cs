@@ -11,7 +11,7 @@ namespace cis2055_NemesysProject.ViewModel
     public class CreateReportViewModel
     {
         public int ReportId { get; set; }
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         [Display(Name = "Hazard Type")]
         [Required(ErrorMessage = "Hazard type must be selected")]
         public int? HazardId { get; set; }
