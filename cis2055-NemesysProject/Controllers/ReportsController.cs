@@ -38,10 +38,11 @@ namespace cis2055_NemesysProject.Controllers
                     ReportId = r.ReportId,
                     UserId = r.UserId,
                     StatusId = r.StatusId,
-                    DateOfReport = r.DateOfReport,  
+                    DateOfReport = r.DateOfReport,
                     DateTimeHazard = r.DateTimeHazard,
                     Description = r.Description,
                     Upvotes = r.Upvotes,
+                    Image = r.Image,
                     Hazard = new HazardViewModel()
                     {
                         HazardId = r.Hazard.HazardId,
@@ -59,22 +60,49 @@ namespace cis2055_NemesysProject.Controllers
         }
 
         // GET: Reports/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var report = await _context.Reports
-                .Include(r => r.User)
-                .FirstOrDefaultAsync(m => m.ReportId == id);
+            var report = _nemesysRepository.GetReportById(id);
             if (report == null)
             {
                 return NotFound();
             }
 
-            return View(report);
+            var model = new ReportDetailsViewModel()
+            {
+                ReportId = report.ReportId,
+                UserId = report.UserId,
+                StatusId = report.StatusId,
+                DateOfReport = report.DateOfReport,
+                DateTimeHazard = report.DateTimeHazard,
+                Description = report.Description,
+                Upvotes = report.Upvotes,
+                Image = report.Image,
+                Latitude = report.Latitude,
+                Longitude = report.Longitude,
+                Hazard = new HazardViewModel()
+                {
+                    HazardId = report.Hazard.HazardId,
+                    HazardType = report.Hazard.HazardType,
+                },
+                Status = new StatusCategory()
+                {
+                    StatusId = report.Status.StatusId,
+                    StatusType = report.Status.StatusType
+                },
+                User = new User()
+                {
+                    UserId = report.UserId,
+                }
+            };
+
+
+            return View(model);
         }
 
         // GET: Reports/Create
@@ -104,7 +132,7 @@ namespace cis2055_NemesysProject.Controllers
                 string fileName = "";
                 if (report.ImageToUpload != null)
                 {
-                    
+
                     var extension = "." + report.ImageToUpload.FileName.Split('.')[report.ImageToUpload.FileName.Split('.').Length - 1];
                     fileName = Guid.NewGuid().ToString() + extension;
                     var path = Directory.GetCurrentDirectory() + "\\wwwroot\\images\\reports\\" + fileName;

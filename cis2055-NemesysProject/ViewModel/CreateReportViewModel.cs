@@ -25,7 +25,7 @@ namespace cis2055_NemesysProject.ViewModel
 
         [Required(ErrorMessage = "Report description cannot be empty.")]
         public string Description { get; set; }
-
+        [DataType(DataType.Upload)]
         [Display(Name = "Hazard Image")]
         public IFormFile ImageToUpload { get; set; }
         [Required (ErrorMessage = "Please place a marker on the map or input latitude")]

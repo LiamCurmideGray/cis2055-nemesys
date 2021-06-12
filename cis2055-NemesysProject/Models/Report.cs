@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 #nullable disable
 
@@ -16,8 +17,11 @@ namespace cis2055_NemesysProject.Models
 
         public int ReportId { get; set; }
         public int UserId { get; set; }
+        [Display(Name = "Date of Report")]
         public DateTime DateOfReport { get; set; }
+        [Display(Name = "Hazard Spotted")]
         public DateTime DateTimeHazard { get; set; }
+        [Display(Name = "Description")]
         public string Description { get; set; }
         public int Upvotes { get; set; }
         public string Image { get; set; }

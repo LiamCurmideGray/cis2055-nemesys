@@ -1,4 +1,4 @@
-﻿@model cis2055_NemesysProject.Models.Report
+﻿@model cis2055_NemesysProject.ViewModel.ReportDetailsViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -10,57 +10,77 @@
     <h4>Report</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Status.StatusType)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Status.StatusType)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Hazard.HazardType)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Hazard.HazardType)
+        </dd>
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.DateOfReport)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.DateOfReport)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.DateTimeHazard)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.DateTimeHazard)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Description)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Description)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Upvotes)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Upvotes)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Image)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Image)
-        </dd>
-        <dt class = "col-sm-2">
+        @if (Model.Image != "")
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Image)
+            </dt>
+            <dd class="col-sm-10">
+                <img src="@Model.Image" width="500"/>
+            </dd>
+        }
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Latitude)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Latitude)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Longitude)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Longitude)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.User)
+        <dt class="col-sm-2">
+            Reporter
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.User.Email)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.User.UserId)
         </dd>
     </dl>
 </div>
+<div id="map"></div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.ReportId">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+
+<link rel="stylesheet" href="~/css/map.css">
+<script src="~/js/reportDetailsMap.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyChmvdq02aq8Sa68jTYFghQZz_1LFFUp8o&callback=initMap&libraries=&v=weekly" async onload="initMap('@Model.Latitude', '@Model.Longitude')"></script>
