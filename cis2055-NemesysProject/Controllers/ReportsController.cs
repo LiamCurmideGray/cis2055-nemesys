@@ -8,24 +8,54 @@ using Microsoft.EntityFrameworkCore;
 using cis2055_NemesysProject.Data;
 using cis2055_NemesysProject.Models;
 using cis2055_NemesysProject.ViewModel;
+using cis2055_NemesysProject.Data.Interfaces;
 using System.IO;
+using Microsoft.Extensions.Logging;
 
 namespace cis2055_NemesysProject.Controllers
 {
     public class ReportsController : Controller
     {
         private readonly cis2055nemesysContext _context;
+        private readonly INemesysRepository _nemesysRepository;
+        private readonly ILogger<ReportsController> _logger;
 
-        public ReportsController(cis2055nemesysContext context)
+        public ReportsController(cis2055nemesysContext context, INemesysRepository nemesysRepository, ILogger<ReportsController> logger)
         {
             _context = context;
+            _nemesysRepository = nemesysRepository;
+            _logger = logger;
         }
 
         // GET: Reports
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var cis2055nemesysContext = _context.Reports.Include(r => r.User);
-            return View(await cis2055nemesysContext.ToListAsync());
+            var model = new ReportListViewModel()
+            {
+                TotalReports = _nemesysRepository.GetAllReports().Count(),
+                Reports = _nemesysRepository.GetAllReports().OrderByDescending(d => d.DateOfReport).Select(r => new ReportViewModel
+                {
+                    ReportId = r.ReportId,
+                    UserId = r.UserId,
+                    StatusId = r.StatusId,
+                    DateOfReport = r.DateOfReport,  
+                    DateTimeHazard = r.DateTimeHazard,
+                    Description = r.Description,
+                    Upvotes = r.Upvotes,
+                    Hazard = new HazardViewModel()
+                    {
+                        HazardId = r.Hazard.HazardId,
+                        HazardType = r.Hazard.HazardType
+                    },
+                    Status = new StatusCategory()
+                    {
+                        StatusId = r.Status.StatusId,
+                        StatusType = r.Status.StatusType
+                    }
+                })
+            };
+            //var cis2055nemesysContext = _context.Reports.Include(r => r.User);
+            return View(model);
         }
 
         // GET: Reports/Details/5
@@ -95,19 +125,10 @@ namespace cis2055_NemesysProject.Controllers
                     Image = imageUrl,
                     Longitude = (double)report.Longitude,
                     Latitude = (double)report.Latitude,
-                    StatusId = 1
+                    StatusId = 1,
+                    HazardId = (int)report.HazardId
                 };
                 _context.Add(newReport);
-                await _context.SaveChangesAsync();
-
-                // can be modified to support many to many like in database
-                Report reportObj = _context.Reports.OrderBy(r => r.ReportId).Last();
-                ReportHazard reportHazard = new ReportHazard()
-                {
-                    HazardId = (int)report.HazardId,
-                    ReportId = reportObj.ReportId
-                };
-                _context.Add(reportHazard);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -134,7 +155,6 @@ namespace cis2055_NemesysProject.Controllers
 
             var report = await _context.Reports.FindAsync(id);
             var hazards = _context.Hazards.ToList();
-            var hazardId = _context.ReportHazards.Where(r => r.ReportId == id).Select(i => i.HazardId).FirstOrDefault();
             if (report == null)
             {
                 return NotFound();
@@ -143,7 +163,7 @@ namespace cis2055_NemesysProject.Controllers
             {
                 ReportId = report.ReportId,
                 UserId = report.UserId,
-                HazardId = hazardId,
+                HazardId = report.HazardId,
                 DateTimeHazard = report.DateTimeHazard,
                 Description = report.Description,
                 Image = report.Image,
@@ -167,8 +187,6 @@ namespace cis2055_NemesysProject.Controllers
                 try
                 {
                     var modelToUpdate = await _context.Reports.FindAsync(id);
-                    var reportHazardId = _context.ReportHazards.Where(r => r.ReportId == id).Select(i => i.HazardId).FirstOrDefault();
-                    var reportHazard = _context.ReportHazards.Find(reportHazardId, id);
                     if (modelToUpdate == null)
                     {
                         return NotFound();
@@ -196,14 +214,8 @@ namespace cis2055_NemesysProject.Controllers
                     modelToUpdate.Image = imageUrl;
                     modelToUpdate.Latitude = (double)report.Latitude;
                     modelToUpdate.Longitude = (double)report.Longitude;
-                    _context.Remove(reportHazard);
-                    await _context.SaveChangesAsync();
+                    modelToUpdate.HazardId = (int)report.HazardId;
 
-                    reportHazard.ReportId = id;
-                    reportHazard.HazardId = (int)report.HazardId;
-
-                    _context.Add(reportHazard);
-                    await _context.SaveChangesAsync();
                     _context.Update(modelToUpdate);
                     await _context.SaveChangesAsync();
                 }
@@ -231,8 +243,6 @@ namespace cis2055_NemesysProject.Controllers
                 };
                 return View(model);
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email", report.UserId);
-            return View(report);
         }
 
         // GET: Reports/Delete/5
@@ -267,6 +277,8 @@ namespace cis2055_NemesysProject.Controllers
             }
 
             var report = await _context.Reports.FindAsync(id);
+            if (report.Image != "")
+                System.IO.File.Delete("wwwroot" + report.Image);
             _context.Reports.Remove(report);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<cis2055_NemesysProject.Models.Report>
+﻿@model cis2055_NemesysProject.ViewModel.ReportListViewModel
 
 @{
     ViewData["Title"] = "Index";
@@ -9,69 +9,30 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.DateOfReport)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateTimeHazard)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Upvotes)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Image)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Latitude)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Longitude)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateOfReport)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateTimeHazard)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Upvotes)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Image)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Latitude)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Longitude)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Email)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ReportId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ReportId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ReportId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="row">
+    @foreach (var report in Model.Reports)
+    {
+<div class="card" style="width: 18rem;padding:20px; margin:20px;">
+    
+    <div class="card-body">
+        <h3 class="card-title"><b>Status: </b>@report.Status.StatusType</h3>
+        <p class="text-body"><b>Created on:</b> @report.DateOfReport.ToShortDateString(), <br /><b>Hazard spotted:</b> @report.DateTimeHazard.ToShortDateString(),<br /><b>Type of hazard:</b> @report.Hazard.HazardType,<br /><b>Upvotes:</b> @report.Upvotes, <br /><b>Description:</b> @report.Description </p>
+        <div class="button-container">
+            <table>
+                <tr>
+                    <td>
+                        <a asp-controller="Reports" asp-action="Edit" asp-route-id="@report.ReportId" class="btn btn-outline-primary">Edit</a>
+                    </td>
+                    <td>
+                        <a asp-controller="Reports" asp-action="Details" asp-route-id="@report.ReportId" class="btn btn-outline-dark">Details</a>
+                    </td>
+                    <td>
+                        <a asp-controller="Reports" asp-action="Delete" asp-route-id="@report.ReportId" class="btn btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+            </table>
+            
+        </div>
+    </div>
+</div>}
+</div>

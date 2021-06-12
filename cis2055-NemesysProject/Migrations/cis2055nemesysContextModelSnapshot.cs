@@ -218,10 +218,10 @@ namespace cis2055_NemesysProject.Migrations
 
             modelBuilder.Entity("cis2055_NemesysProject.Models.Hazard", b =>
                 {
-                    b.Property<int>("HarzardId")
+                    b.Property<int>("HazardId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("Harzard_ID")
+                        .HasColumnName("Hazard_ID")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("HazardType")
@@ -230,7 +230,7 @@ namespace cis2055_NemesysProject.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(50)");
 
-                    b.HasKey("HarzardId");
+                    b.HasKey("HazardId");
 
                     b.ToTable("Hazards");
                 });

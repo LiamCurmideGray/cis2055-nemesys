@@ -3,8 +3,8 @@ var pinpoints = [];
 
 function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 35.9375, lng: 14.3754 },
-        zoom: 11,
+        center: { lat: 35.90237823412264, lng: 14.483890693511862 },
+        zoom: 17,
         options: {
             gestureHandling: 'greedy'
         }
