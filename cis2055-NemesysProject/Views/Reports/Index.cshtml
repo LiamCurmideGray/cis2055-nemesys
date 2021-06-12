@@ -27,14 +27,15 @@
 
             <div class="card-body">
                 <h3 class="card-title"><b>Status: </b>@report.Status.StatusType</h3>
-        <p class="text-body"><b>Created on:</b> @report.DateOfReport.ToShortDateString()<br />
-        <b>Hazard spotted:</b> @report.DateTimeHazard.ToShortDateString()<br />
-        <b>Type of hazard:</b> @report.Hazard.HazardType<br />
-        <b>Upvotes:</b> @report.Upvotes<br />
-        <b>Description:</b> @report.Description 
-        <img src="@report.Image" width="200" style="text-align: center;"/><div class="button-container">
-              </p>
-              <div class="button-container">
+                <p class="text-body">
+                    <b>Created on:</b> @report.DateOfReport.ToShortDateString()<br />
+                    <b>Hazard spotted:</b> @report.DateTimeHazard.ToShortDateString()<br />
+                    <b>Type of hazard:</b> @report.Hazard.HazardType<br />
+                    <b>Upvotes:</b> @report.Upvotes<br />
+                    <b>Description:</b> @report.Description
+                    <img src="@report.Image" width="200" style="text-align: center;" />
+                </p>
+                <div class="button-container">
                     <table>
 
                         <tr>
@@ -59,10 +60,9 @@
                             }
                         </tr>
                     </table>
-        </div>
-
                 </div>
-            </div>
-        </div>}
-</div>
 
+            </div>
+        </div>
+    }
+</div>
