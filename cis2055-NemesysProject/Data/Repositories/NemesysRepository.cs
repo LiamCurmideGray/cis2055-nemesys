@@ -44,7 +44,7 @@ namespace cis2055_NemesysProject.Data.Repositories
         {
             try
             {
-                return _context.Reports.Include(r => r.Status).Include(r => r.User).Include(r => r.Investigations).FirstOrDefault(p => p.ReportId == id);
+                return _context.Reports.Include(r => r.Status).Include(r => r.User).Include(r => r.Hazard).FirstOrDefault(p => p.ReportId == id);
             }
             catch (Exception ex)
             {
