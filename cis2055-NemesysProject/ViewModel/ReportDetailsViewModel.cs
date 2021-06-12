@@ -10,7 +10,7 @@ namespace cis2055_NemesysProject.ViewModel
     public class ReportDetailsViewModel
     {
         public int ReportId { get; set; }
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public int StatusId { get; set; }
         [Display(Name = "Date of Report")]
         public DateTime DateOfReport { get; set; }
@@ -23,6 +23,6 @@ namespace cis2055_NemesysProject.ViewModel
         public double Longitude { get; set; }
         public HazardViewModel Hazard { get; set; }
         public StatusCategory Status { get; set; }
-        public User User { get; set; }
+        public NemesysUser User { get; set; }
     }
 }

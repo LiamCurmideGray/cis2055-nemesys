@@ -104,9 +104,9 @@ namespace cis2055_NemesysProject.Controllers
                     StatusId = report.Status.StatusId,
                     StatusType = report.Status.StatusType
                 },
-                User = new User()
+                User = new NemesysUser()
                 {
-                    UserId = report.UserId,
+                    Id = report.UserId,
                 }
             };
 
