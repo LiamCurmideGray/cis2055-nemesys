@@ -1,5 +1,16 @@
-﻿@model cis2055_NemesysProject.ViewModel.ReportListViewModel
+@*﻿@model cis2055_NemesysProject.ViewModel.ReportListViewModel*@
 
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<NemesysUser> UserManager
+
+@model cis2055_NemesysProject.ViewModel.ReportListViewModel
+
+
+
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+}
 @{
     ViewData["Title"] = "Index";
 }
@@ -12,33 +23,46 @@
 <div class="row">
     @foreach (var report in Model.Reports)
     {
-<div class="card" style="width: 18rem;padding:20px; margin:20px;">
-    
-    <div class="card-body">
-        <h3 class="card-title"><b>Status: </b>@report.Status.StatusType</h3>
+        <div class="card" style="width: 18rem;padding:20px; margin:20px;">
+
+            <div class="card-body">
+                <h3 class="card-title"><b>Status: </b>@report.Status.StatusType</h3>
         <p class="text-body"><b>Created on:</b> @report.DateOfReport.ToShortDateString()<br />
         <b>Hazard spotted:</b> @report.DateTimeHazard.ToShortDateString()<br />
         <b>Type of hazard:</b> @report.Hazard.HazardType<br />
         <b>Upvotes:</b> @report.Upvotes<br />
         <b>Description:</b> @report.Description 
-        <img src="@report.Image" width="200" style="text-align: center;"/>
-        </p>
-        <div class="button-container">
-            <table>
-                <tr>
-                    <td>
-                        <a asp-controller="Reports" asp-action="Edit" asp-route-id="@report.ReportId" class="btn btn-outline-primary">Edit</a>
-                    </td>
-                    <td>
-                        <a asp-controller="Reports" asp-action="Details" asp-route-id="@report.ReportId" class="btn btn-outline-dark">Details</a>
-                    </td>
-                    <td>
-                        <a asp-controller="Reports" asp-action="Delete" asp-route-id="@report.ReportId" class="btn btn-outline-danger">Delete</a>
-                    </td>
-                </tr>
-            </table>
-            
+        <img src="@report.Image" width="200" style="text-align: center;"/><div class="button-container">
+              </p>
+              <div class="button-container">
+                    <table>
+
+                        <tr>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                @if (report.UserId.Equals(user.Id))
+                                {
+                                    <td>
+                                        <a asp-controller="Reports" asp-action="Edit" asp-route-id="@report.ReportId" class="btn btn-outline-primary">Edit</a>
+                                    </td>
+                                }
+                                <td>
+                                    <a asp-controller="Reports" asp-action="Details" asp-route-id="@report.ReportId" class="btn btn-outline-dark">Details</a>
+                                </td>
+                                @if (report.UserId.Equals(user.Id))
+                                {
+                                    <td>
+                                        <a asp-controller="Reports" asp-action="Delete" asp-route-id="@report.ReportId" class="btn btn-outline-danger">Delete</a>
+                                    </td>
+                                }
+
+                            }
+                        </tr>
+                    </table>
         </div>
-    </div>
-</div>}
+
+                </div>
+            </div>
+        </div>}
 </div>
+

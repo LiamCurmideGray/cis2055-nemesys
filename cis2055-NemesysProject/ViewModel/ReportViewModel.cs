@@ -9,7 +9,7 @@ namespace cis2055_NemesysProject.ViewModel
     public class ReportViewModel
     {
         public int ReportId { get; set; }
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public int StatusId { get; set; }
         public DateTime DateOfReport { get; set; }
         public DateTime DateTimeHazard { get; set; }

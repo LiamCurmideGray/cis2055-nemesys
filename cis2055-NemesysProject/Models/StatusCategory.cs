@@ -12,6 +12,7 @@ namespace cis2055_NemesysProject.Models
         {
             Reports = new HashSet<Report>();
         }
+        [Key]
         public int StatusId { get; set; }
         [Display(Name = "Status")]
         public string StatusType { get; set; }

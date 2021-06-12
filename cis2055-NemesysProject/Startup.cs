@@ -15,44 +15,63 @@ using cis2055_NemesysProject.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Session;
 using Microsoft.AspNetCore.Identity;
+using cis2055_NemesysProject.Models;
 
 namespace cis2055_NemesysProject
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<INemesysRepository, NemesysRepository>();
-            services.AddMvc();
-            services.AddDistributedMemoryCache();
-            services.AddSession(options =>
+            //services.AddMvc().AddJsonOptions();
+            //services.AddDistributedMemoryCache();
+            //services.AddSession(options =>
+            //{
+            //    options.IdleTimeout = TimeSpan.FromHours(1);
+            //});
+
+
+            services.AddDbContext<cis2055nemesysContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("NemesysContext")));
+
+            
+            services.AddDefaultIdentity<NemesysUser>(options =>
             {
-                options.IdleTimeout = TimeSpan.FromHours(1);
-            });
+                options.SignIn.RequireConfirmedAccount = true;
+                // Password settings.
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequiredLength = 4;
+                options.Password.RequiredUniqueChars = 1;
 
-            services.AddDbContext<cis2055nemesysContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("NemesysContext")));
-            services.AddControllersWithViews();
-            services.AddRazorPages();
+                // Lockout settings.
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.AllowedForNewUsers = true;
 
-            services.AddDbContext<cis2055nemesysContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("NemesysContext")));
-
-            services.AddIdentity<IdentityUser, IdentityRole>()
+                // User settings.
+                options.User.AllowedUserNameCharacters =
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                options.User.RequireUniqueEmail = false;
+            })
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<cis2055nemesysContext>();
 
             services.AddTransient<IStatusCategoryRepository, StatusCategoryRepository>();
 
-            services.AddControllersWithViews(); //cannot find it .AddRazorRuntimeCompilation();
-            services.AddRazorPages();
+            services.AddControllersWithViews().AddRazorRuntimeCompilation(); //cannot find it .AddRazorRuntimeCompilation();
+            //services.AddRazorPages();
 
 
         }
@@ -76,11 +95,11 @@ namespace cis2055_NemesysProject
 
             app.UseRouting();
 
-            app.UseAuthorization();
             app.UseAuthentication();
+            app.UseAuthorization();
 
             //app.UseMvc();
-            app.UseSession();
+            //app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {
