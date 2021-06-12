@@ -9,6 +9,8 @@ using cis2055_NemesysProject.Data;
 using cis2055_NemesysProject.Models;
 using cis2055_NemesysProject.ViewModel;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace cis2055_NemesysProject.Controllers
 {
@@ -16,12 +18,18 @@ namespace cis2055_NemesysProject.Controllers
     {
         private readonly cis2055nemesysContext _context;
 
-        public ReportsController(cis2055nemesysContext context)
+        private readonly UserManager<NemesysUser> _userManager;
+
+        public ReportsController(cis2055nemesysContext context, UserManager<NemesysUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Reports
+        //[Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Reporter")]
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             var cis2055nemesysContext = _context.Reports.Include(r => r.User);
@@ -48,11 +56,13 @@ namespace cis2055_NemesysProject.Controllers
         }
 
         // GET: Reports/Create
+        [Authorize(Roles = "Reporter")]
         public IActionResult Create()
         {
-            ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email");
+            //ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email");
             ViewData["HazardId"] = new SelectList(_context.Hazards, "HazardId", "HazardType");
             var hazards = _context.Hazards.ToList();
+
 
             var model = new CreateReportViewModel()
             {
@@ -65,8 +75,10 @@ namespace cis2055_NemesysProject.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Authorize(Roles = "Reporter")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserId,HazardId,DateTimeHazard,Description,ImageToUpload,Latitude,Longitude")] CreateReportViewModel report)
+        //public async Task<IActionResult> Create([Bind("UserId,HazardId,DateTimeHazard,Description,ImageToUpload,Latitude,Longitude")] CreateReportViewModel report)
+        public async Task<IActionResult> Create([Bind("HazardId,DateTimeHazard,Description,ImageToUpload,Latitude,Longitude")] CreateReportViewModel report)
         {
             if (ModelState.IsValid)
             {
@@ -74,7 +86,7 @@ namespace cis2055_NemesysProject.Controllers
                 string fileName = "";
                 if (report.ImageToUpload != null)
                 {
-                    
+
                     var extension = "." + report.ImageToUpload.FileName.Split('.')[report.ImageToUpload.FileName.Split('.').Length - 1];
                     fileName = Guid.NewGuid().ToString() + extension;
                     var path = Directory.GetCurrentDirectory() + "\\wwwroot\\images\\reports\\" + fileName;
@@ -87,7 +99,7 @@ namespace cis2055_NemesysProject.Controllers
 
                 Report newReport = new Report()
                 {
-                    UserId = report.UserId,
+                    UserId = _userManager.GetUserId(User),
                     DateOfReport = DateTime.UtcNow,
                     DateTimeHazard = report.DateTimeHazard,
                     Description = report.Description,
@@ -125,6 +137,7 @@ namespace cis2055_NemesysProject.Controllers
         }
 
         // GET: Reports/Edit/5
+        [Authorize(Roles = "Reporter")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -139,20 +152,29 @@ namespace cis2055_NemesysProject.Controllers
             {
                 return NotFound();
             }
-            CreateReportViewModel model = new CreateReportViewModel()
+
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (report.UserId == currentUser.Id)
             {
-                ReportId = report.ReportId,
-                UserId = report.UserId,
-                HazardId = hazardId,
-                DateTimeHazard = report.DateTimeHazard,
-                Description = report.Description,
-                Image = report.Image,
-                Longitude = report.Longitude,
-                Latitude = report.Latitude,
-                HazardList = hazards,
-            };
-            ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email", report.UserId);
-            return View(model);
+                CreateReportViewModel model = new CreateReportViewModel()
+                {
+                    ReportId = report.ReportId,
+                    UserId = _userManager.GetUserId(User),
+                    HazardId = hazardId,
+                    DateTimeHazard = report.DateTimeHazard,
+                    Description = report.Description,
+                    Image = report.Image,
+                    Longitude = report.Longitude,
+                    Latitude = report.Latitude,
+                    HazardList = hazards,
+                };
+                return View(model);
+            }
+            else
+            {
+                return Unauthorized();
+            }
+
         }
 
         // POST: Reports/Edit/5
@@ -160,82 +182,93 @@ namespace cis2055_NemesysProject.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UserId,HazardId,DateTimeHazard,Description,ImageToUpload,Latitude,Longitude")] CreateReportViewModel report)
+        [Authorize(Roles = "Reporter")]
+        public async Task<IActionResult> Edit(int id, [Bind("HazardId,DateTimeHazard,Description,ImageToUpload,Latitude,Longitude")] CreateReportViewModel report)
         {
-            if (ModelState.IsValid)
+            var modelToUpdate = await _context.Reports.FindAsync(id);
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (modelToUpdate.User.Id == currentUser.Id)
             {
-                try
-                {
-                    var modelToUpdate = await _context.Reports.FindAsync(id);
-                    var reportHazardId = _context.ReportHazards.Where(r => r.ReportId == id).Select(i => i.HazardId).FirstOrDefault();
-                    var reportHazard = _context.ReportHazards.Find(reportHazardId, id);
-                    if (modelToUpdate == null)
-                    {
-                        return NotFound();
-                    }
-                    string fileName = "";
-                    string imageUrl = "";
-                    if (report.ImageToUpload != null)
-                    {
 
-                        var extension = "." + report.ImageToUpload.FileName.Split('.')[report.ImageToUpload.FileName.Split('.').Length - 1];
-                        fileName = Guid.NewGuid().ToString() + extension;
-                        var path = Directory.GetCurrentDirectory() + "\\wwwroot\\images\\reports\\" + fileName;
-                        using (var bits = new FileStream(path, FileMode.Create))
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        var reportHazardId = _context.ReportHazards.Where(r => r.ReportId == id).Select(i => i.HazardId).FirstOrDefault();
+                        var reportHazard = _context.ReportHazards.Find(reportHazardId, id);
+                        if (modelToUpdate == null)
                         {
-                            report.ImageToUpload.CopyTo(bits);
+                            return NotFound();
                         }
-                        imageUrl = "/images/reports/" + fileName;
+                        string fileName = "";
+                        string imageUrl = "";
+                        if (report.ImageToUpload != null)
+                        {
+
+                            var extension = "." + report.ImageToUpload.FileName.Split('.')[report.ImageToUpload.FileName.Split('.').Length - 1];
+                            fileName = Guid.NewGuid().ToString() + extension;
+                            var path = Directory.GetCurrentDirectory() + "\\wwwroot\\images\\reports\\" + fileName;
+                            using (var bits = new FileStream(path, FileMode.Create))
+                            {
+                                report.ImageToUpload.CopyTo(bits);
+                            }
+                            imageUrl = "/images/reports/" + fileName;
+                        }
+                        else
+                        {
+                            imageUrl = modelToUpdate.Image;
+                        }
+                        modelToUpdate.DateTimeHazard = report.DateTimeHazard;
+                        modelToUpdate.Description = report.Description;
+                        modelToUpdate.Image = imageUrl;
+                        modelToUpdate.Latitude = (double)report.Latitude;
+                        modelToUpdate.Longitude = (double)report.Longitude;
+                        _context.Remove(reportHazard);
+                        await _context.SaveChangesAsync();
+
+                        reportHazard.ReportId = id;
+                        reportHazard.HazardId = (int)report.HazardId;
+
+                        _context.Add(reportHazard);
+                        await _context.SaveChangesAsync();
+                        _context.Update(modelToUpdate);
+                        await _context.SaveChangesAsync();
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        imageUrl = modelToUpdate.Image;
+                        if (!ReportExists(report.ReportId))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
-                    modelToUpdate.DateTimeHazard = report.DateTimeHazard;
-                    modelToUpdate.Description = report.Description;
-                    modelToUpdate.Image = imageUrl;
-                    modelToUpdate.Latitude = (double)report.Latitude;
-                    modelToUpdate.Longitude = (double)report.Longitude;
-                    _context.Remove(reportHazard);
-                    await _context.SaveChangesAsync();
-
-                    reportHazard.ReportId = id;
-                    reportHazard.HazardId = (int)report.HazardId;
-
-                    _context.Add(reportHazard);
-                    await _context.SaveChangesAsync();
-                    _context.Update(modelToUpdate);
-                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!ReportExists(report.ReportId))
+                    //ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email");
+                    var hazards = _context.Hazards.ToList();
+
+                    var model = new CreateReportViewModel()
                     {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                        HazardList = hazards
+                    };
+                    return View(model);
                 }
-                return RedirectToAction(nameof(Index));
+                //ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email", report.UserId);
+                //return View(report);
             }
             else
             {
-                ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email");
-                var hazards = _context.Hazards.ToList();
-
-                var model = new CreateReportViewModel()
-                {
-                    HazardList = hazards
-                };
-                return View(model);
+                return Unauthorized();
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email", report.UserId);
-            return View(report);
         }
 
         // GET: Reports/Delete/5
+        [Authorize(Roles = "Reporter")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -243,7 +276,10 @@ namespace cis2055_NemesysProject.Controllers
                 return NotFound();
             }
 
-            var report = await _context.Reports
+
+          
+
+                var report = await _context.Reports
                 .Include(r => r.User)
                 .FirstOrDefaultAsync(m => m.ReportId == id);
             if (report == null)
@@ -251,12 +287,22 @@ namespace cis2055_NemesysProject.Controllers
                 return NotFound();
             }
 
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (report.User.Id == currentUser.Id)
+            {
             return View(report);
+
+            } else
+            {
+                return Unauthorized();
+            }
+
         }
 
         // POST: Reports/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Reporter")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             List<ReportHazard> reportHazards = _context.ReportHazards.Where(e => e.ReportId == id).ToList();
@@ -267,9 +313,18 @@ namespace cis2055_NemesysProject.Controllers
             }
 
             var report = await _context.Reports.FindAsync(id);
+
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (report.User.Id == currentUser.Id)
+            {
             _context.Reports.Remove(report);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+
+            } else
+            {
+                return Unauthorized();
+            }
         }
 
         private bool ReportExists(int id)

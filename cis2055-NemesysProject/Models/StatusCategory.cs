@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 #nullable disable
 
@@ -12,6 +13,7 @@ namespace cis2055_NemesysProject.Models
             Reports = new HashSet<Report>();
         }
 
+        [Key]
         public int StatusId { get; set; }
         public string StatusType { get; set; }
 
