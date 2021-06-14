@@ -374,6 +374,22 @@ namespace cis2055_NemesysProject.Controllers
             }
         }
 
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        [Authorize (Roles = "Reporter")]
+        public  IActionResult UpdateUpvote(int id)
+        {
+            Report report = _nemesysRepository.GetReportById(id);
+            string userId = _userManager.GetUserId(User);
+
+           if(!report.UserId.Equals(userId))
+            {
+            _nemesysRepository.UpdateReportUpVote(id);
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
         private bool ReportExists(int id)
         {
             return _context.Reports.Any(e => e.ReportId == id);
