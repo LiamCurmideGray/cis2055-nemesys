@@ -52,5 +52,25 @@ namespace cis2055_NemesysProject.Data.Repositories
                 throw;
             }
         }
+
+        public Report UpdateReportUpVote (int reportId)
+        {
+            try
+            {
+            Report report = GetReportById(reportId);
+            report.Upvotes++;
+
+            _context.Update(report);
+            _context.SaveChanges();
+
+            } catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+
+            return null;
+        }
+        
     }
 }
