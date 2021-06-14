@@ -29,6 +29,10 @@
                 <h3 class="card-title"><b>Status: </b>@report.Status.StatusType</h3>
                 <p class="text-body">
                     <b>Created on:</b> @report.DateOfReport.ToShortDateString()<br />
+                    @if (report.User.AuthorAlias != null)
+                    {
+                        <b>Created by:</b> @report.User.AuthorAlias<br />
+                    }
                     <b>Hazard spotted:</b> @report.DateTimeHazard.ToShortDateString()<br />
                     <b>Type of hazard:</b> @report.Hazard.HazardType<br />
                     <b>Upvotes:</b> @report.Upvotes<br />

@@ -18,5 +18,6 @@ namespace cis2055_NemesysProject.ViewModel
         public string Image { get; set; }
         public HazardViewModel Hazard { get; set; }
         public StatusCategory Status { get; set; }
+        public NemesysUser User { get; set; }
     }
 }

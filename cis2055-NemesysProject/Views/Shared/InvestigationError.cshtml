@@ -1,0 +1,18 @@
+﻿@using cis2055_NemesysProject.Models 
+@{
+    ViewData["Title"] = "InvestigationError";
+
+    var data = ViewData["ReportId"];
+}
+
+<h2>Woops!</h2>
+<h2>This report already has an investigation open!</h2>
+<div>
+    <hr />
+    <dl class="row">
+
+        <dd class="col-sm-10">
+            <a asp-controller="Reports" asp-action="Details" asp-route-id="@data">Go back to the details</a>
+        </dd>
+    </dl>
+</div>

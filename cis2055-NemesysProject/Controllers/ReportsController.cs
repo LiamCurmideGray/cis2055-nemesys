@@ -60,7 +60,8 @@ namespace cis2055_NemesysProject.Controllers
                     {
                         StatusId = r.Status.StatusId,
                         StatusType = r.Status.StatusType
-                    }
+                    },
+                    User = r.User
                 })
             };
             //var cis2055nemesysContext = _context.Reports.Include(r => r.User);
@@ -75,7 +76,7 @@ namespace cis2055_NemesysProject.Controllers
             {
                 return NotFound();
             }
-
+            var reportInvestigation = _context.Investigations.FirstOrDefault(i => i.ReportId == id);
             var report = _nemesysRepository.GetReportById(id);
             if (report == null)
             {
@@ -107,9 +108,18 @@ namespace cis2055_NemesysProject.Controllers
                 User = new NemesysUser()
                 {
                     Id = report.UserId,
-                }
+                    UserName = report.User.UserName
+                },
+                //Investigation = new Investigation()
+                //{
+                //    Description = report.Investigation.Description,
+                //    User = new NemesysUser()
+                //    {
+                //        UserName = report.Investigation.User.UserName
+                //    }
+                //}
             };
-
+            ViewData["ReportInvestigation"] = reportInvestigation;
 
             return View(model);
         }

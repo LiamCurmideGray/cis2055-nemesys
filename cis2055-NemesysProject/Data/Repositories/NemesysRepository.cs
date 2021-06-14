@@ -31,7 +31,7 @@ namespace cis2055_NemesysProject.Data.Repositories
         public IEnumerable<Report> GetAllReports()
         {
             try{
-                return _context.Reports.Include(r => r.Status).Include(r => r.Hazard).OrderBy(r => r.DateOfReport);
+                return _context.Reports.Include(r => r.Status).Include(r => r.Hazard).Include(r => r.User).OrderBy(r => r.DateOfReport);
             }
             catch(Exception ex)
             {
