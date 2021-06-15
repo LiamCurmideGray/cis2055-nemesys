@@ -21,6 +21,7 @@ namespace cis2055_NemesysProject.Models
         public virtual Report Report { get; set; }
         public string UserId { get; set; }
         public virtual NemesysUser User { get; set; }
+        //public virtual LogInvestigation LogInvestigation { get; set; }
         public virtual ICollection<LogInvestigation> LogInvestigations { get; set; }
     }
 }

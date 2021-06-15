@@ -1,7 +1,11 @@
 ﻿@model cis2055_NemesysProject.ViewModel.InvestigationViewModel
 
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<NemesysUser> UserManager
+
 @{
     ViewData["Title"] = "Details";
+    var user = await UserManager.GetUserAsync(User);
 }
 
 <h1>Details</h1>
@@ -23,9 +27,12 @@
             <b>@Html.DisplayNameFor(model => model.User.Email) :</b>
             @Html.DisplayFor(model => model.User.Email)
             <br />
-            <b>@Html.DisplayNameFor(model => model.User.PhoneNumber) :</b>
-            @Html.DisplayFor(model => model.User.PhoneNumber)
-            <br />
+            @if (Model.User.PhoneNumber != null)
+            {
+                <b>@Html.DisplayNameFor(model => model.User.PhoneNumber) :</b>
+                @Html.DisplayFor(model => model.User.PhoneNumber)
+                <br />
+            }
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Report)
@@ -49,23 +56,36 @@
             <b>@Html.DisplayNameFor(model => model.Report.Hazard.HazardType) :</b>
             @Html.DisplayFor(model => model.Report.Hazard.HazardType)
             <br />
-            <b>@Html.DisplayNameFor(model => model.Report.Image) :</b>
-            <img src="@Model.Report.Image" width="500" />
-            <br />
+            @if (Model.Report.Image != "")
+            {
+                <b>@Html.DisplayNameFor(model => model.Report.Image) :</b>
+                <img src="@Model.Report.Image" width="500" />
+                <br />
+            }
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Report)
+            @Html.DisplayNameFor(model => model.Report.User)
         </dt>
         <dd class="col-sm-10">
             <b>@Html.DisplayNameFor(model => model.Report.User.Email) :</b>
             @Html.DisplayFor(model => model.Report.User.Email)
             <br />
-            <b>@Html.DisplayNameFor(model => model.Report.User.PhoneNumber) :</b>
-            @Html.DisplayFor(model => model.Report.User.PhoneNumber)
+            @if (Model.Report.User.PhoneNumber != null)
+            {
+                <b>@Html.DisplayNameFor(model => model.Report.User.PhoneNumber) :</b>
+                @Html.DisplayFor(model => model.Report.User.PhoneNumber)
+            }
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.InvestigationId">Edit</a> |
+    @if (User.Identity.IsAuthenticated)
+    {
+        <a asp-controller="Reports" asp-action="Details" asp-route-id="@Model.ReportId">View Report Details</a>
+        @if (Model.User.Id.Equals(user.Id))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.InvestigationId">| Edit |</a>
+        }
+    }
     <a asp-action="Index">Back to List</a>
 </div>

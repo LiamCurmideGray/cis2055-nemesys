@@ -16,7 +16,7 @@ namespace cis2055_NemesysProject.ViewModel
         public string UserId { get; set; }
         [Display (Name = "Investigator")]
         public NemesysUser User { get; set; }
-        [Display (Name = "Reporter")]
+        [Display (Name = "Report")]
         public Report Report { get; set; }
         public Hazard Hazard { get; set; }
     }

@@ -59,9 +59,15 @@ namespace cis2055_NemesysProject.Controllers
                     Status = new StatusCategory()
                     {
                         StatusId = r.Status.StatusId,
-                        StatusType = r.Status.StatusType
+                        StatusType = r.Status.StatusType    
                     },
-                    User = r.User
+                    User = new NemesysUser()
+                    {
+                        Id = _nemesysRepository.GetUserByReportId(r.ReportId).Id,
+                        UserName = _nemesysRepository.GetUserByReportId(r.ReportId).UserName,
+                        Email = _nemesysRepository.GetUserByReportId(r.ReportId).Email,
+                        AuthorAlias = _nemesysRepository.GetUserByReportId(r.ReportId).AuthorAlias
+                    }
                 })
             };
             //var cis2055nemesysContext = _context.Reports.Include(r => r.User);
@@ -108,17 +114,23 @@ namespace cis2055_NemesysProject.Controllers
                 User = new NemesysUser()
                 {
                     Id = report.UserId,
-                    UserName = report.User.UserName
+                    UserName = report.User.UserName,
+                    PhoneNumber = report.User.PhoneNumber
                 },
-                //Investigation = new Investigation()
-                //{
-                //    Description = report.Investigation.Description,
-                //    User = new NemesysUser()
-                //    {
-                //        UserName = report.Investigation.User.UserName
-                //    }
-                //}
+                
             };
+            if(reportInvestigation != null)
+            {
+                var user = _nemesysRepository.GetUserById(reportInvestigation.UserId);
+                model.Investigation = new Investigation()
+                {
+                    Description = reportInvestigation.Description,
+                    User = new NemesysUser()
+                    {
+                        UserName = reportInvestigation.User.UserName
+                    }
+                };
+            }
             ViewData["ReportInvestigation"] = reportInvestigation;
 
             return View(model);

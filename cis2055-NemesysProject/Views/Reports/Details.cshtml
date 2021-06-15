@@ -82,6 +82,17 @@
             <br />
             @Html.DisplayFor(model => model.User.PhoneNumber)
         </dd>
+        @if (Model.Investigation != null)
+        {
+            <dt class="col-sm-2">
+                Investigation
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Investigation.Description)
+                <br />
+                @Html.DisplayFor(model => model.Investigation.User.Email)
+            </dd>
+        }
     </dl>
 </div>
 <div id="map"></div>
@@ -98,7 +109,7 @@
         }
         <a asp-action="Index">Back to List</a>
     }
-    </div>
+</div>
 
 <link rel="stylesheet" href="~/css/map.css">
 <script src="~/js/reportDetailsMap.js"></script>

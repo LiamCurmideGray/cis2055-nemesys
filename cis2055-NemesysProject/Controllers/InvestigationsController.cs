@@ -30,6 +30,7 @@ namespace cis2055_NemesysProject.Controllers
             _nemesysRepository = nemesysRepository;
         }
 
+        [Authorize(Roles = "Investigator")]
         // GET: Investigations
         public async Task<IActionResult> Index()
         {
@@ -61,6 +62,7 @@ namespace cis2055_NemesysProject.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Investigator")]
         // GET: Investigations/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -78,41 +80,42 @@ namespace cis2055_NemesysProject.Controllers
             var model = new InvestigationViewModel()
             {
                 InvestigationId = investigation.InvestigationId,
-                    ReportId = investigation.ReportId,
-                    Report = new Report()
+                ReportId = investigation.ReportId,
+                Report = new Report()
+                {
+                    ReportId = investigation.Report.ReportId,
+                    Description = investigation.Report.Description,
+                    DateOfReport = investigation.Report.DateOfReport,
+                    DateTimeHazard = reportInvestigation.DateTimeHazard,
+                    Status = new StatusCategory()
                     {
-                        ReportId = investigation.Report.ReportId,
-                        Description = investigation.Report.Description,
-                        DateOfReport = investigation.Report.DateOfReport,
-                        Status = new StatusCategory()
-                        {
-                            StatusId = reportInvestigation.Status.StatusId,
-                            StatusType = reportInvestigation.Status.StatusType
-                        },
-                        Hazard = new Hazard()
-                        {
-                            HazardId = reportInvestigation.Hazard.HazardId,
-                            HazardType = reportInvestigation.Hazard.HazardType
-                        },
-                        User = new NemesysUser()
-                        {
-                            Id = reportInvestigation.User.Id,
-                            UserName = reportInvestigation.User.UserName,
-                            AuthorAlias = reportInvestigation.User.AuthorAlias,
-                            PhoneNumber = reportInvestigation.User.PhoneNumber,
-                            Email = reportInvestigation.User.Email
-                        },
-                        Image = reportInvestigation.Image
+                        StatusId = reportInvestigation.Status.StatusId,
+                        StatusType = reportInvestigation.Status.StatusType
                     },
-                    Description = investigation.Description,
+                    Hazard = new Hazard()
+                    {
+                        HazardId = reportInvestigation.Hazard.HazardId,
+                        HazardType = reportInvestigation.Hazard.HazardType
+                    },
                     User = new NemesysUser()
                     {
-                        Id = investigation.User.Id,
-                        UserName = investigation.User.UserName,
-                        AuthorAlias = investigation.User.AuthorAlias,
-                        PhoneNumber = investigation.User.PhoneNumber,
-                        Email = investigation.User.Email
+                        Id = reportInvestigation.User.Id,
+                        UserName = reportInvestigation.User.UserName,
+                        AuthorAlias = reportInvestigation.User.AuthorAlias,
+                        PhoneNumber = reportInvestigation.User.PhoneNumber,
+                        Email = reportInvestigation.User.Email
                     },
+                    Image = reportInvestigation.Image
+                },
+                Description = investigation.Description,
+                User = new NemesysUser()
+                {
+                    Id = investigation.User.Id,
+                    UserName = investigation.User.UserName,
+                    AuthorAlias = investigation.User.AuthorAlias,
+                    PhoneNumber = investigation.User.PhoneNumber,
+                    Email = investigation.User.Email
+                },
             };
             if (investigation == null)
             {
@@ -138,7 +141,8 @@ namespace cis2055_NemesysProject.Controllers
                 {
                     ReportId = id,
                     StatusId = 1,
-                    StatusList = statusList
+                    StatusList = statusList,
+                    User = _userManager.GetUserAsync(User).Result
                 };
                 return View(model);
             }
@@ -155,7 +159,7 @@ namespace cis2055_NemesysProject.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Investigator")]
-        public async Task<IActionResult> Create(int id, [Bind("StatusId,Description")] CreateInvestigationViewModel investigation)
+        public IActionResult Create(int id, [Bind("StatusId,Description")] CreateInvestigationViewModel investigation)
         {
             if (ModelState.IsValid)
             {
@@ -169,18 +173,15 @@ namespace cis2055_NemesysProject.Controllers
                         ReportId = id,
                         Description = investigation.Description,
                         UserId = _userManager.GetUserId(User),
-                        Report = new Report()
-                        {
-                            ReportId = report.ReportId,
-                            DateOfReport = report.DateOfReport,
-                            DateTimeHazard = report.DateTimeHazard,
-                            Description = report.Description,
-                            HazardId = report.HazardId
-                        }
+                        Report = report,
+                        
                     };
                     report.StatusId = investigation.StatusId;
                     _context.Add(newInvestigation);
-                    await _context.SaveChangesAsync();
+                    _context.SaveChanges();
+                    newInvestigation.User = _userManager.GetUserAsync(User).Result;
+                    _context.Update(newInvestigation);
+                    _context.SaveChanges();
 
                     return RedirectToAction(nameof(Index));
                 }
@@ -203,22 +204,34 @@ namespace cis2055_NemesysProject.Controllers
             }
         }
 
+        [Authorize(Roles = "Investigator")]
         // GET: Investigations/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
             if (id == null)
             {
                 return NotFound();
             }
+            var investigation = _nemesysRepository.GetInvestigationById(id);
+            var currUser = _userManager.GetUserId(User);
 
-            var investigation = await _context.Investigations.FindAsync(id);
-            if (investigation == null)
+            if (currUser == investigation.UserId)
             {
-                return NotFound();
+                var statusList = _context.StatusCategories.ToList();
+
+                var model = new CreateInvestigationViewModel()
+                {
+                    InvestigationId = id,
+                    StatusId = investigation.Report.StatusId,
+                    StatusList = statusList,
+                    Description = investigation.Description,
+                };
+                return View(model);
             }
-            ViewData["ReportId"] = new SelectList(_context.Reports, "ReportId", "Description", investigation.ReportId);
-            ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email", investigation.UserId);
-            return View(investigation);
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         // POST: Investigations/Edit/5
@@ -226,19 +239,35 @@ namespace cis2055_NemesysProject.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("InvestigationId,UserId,ReportId")] Investigation investigation)
+        [Authorize(Roles = "Investigator")]
+        public async Task<IActionResult> Edit(int id, [Bind("StatusId,Description")] CreateInvestigationViewModel investigation)
         {
-            if (id != investigation.InvestigationId)
-            {
-                return NotFound();
-            }
+            //if (id != investigation.InvestigationId)
+            //{
+            //    return NotFound();
+            //}
+            var inv = _nemesysRepository.GetInvestigationById(id);
+            var reportId = inv.ReportId;
+            var report = _nemesysRepository.GetReportById(reportId);
+            var currUser = _userManager.GetUserId(User);
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(investigation);
-                    await _context.SaveChangesAsync();
+                    if (currUser == inv.UserId)
+                    {
+                        inv.Description = investigation.Description;
+                        report.StatusId = investigation.StatusId;
+                        //report.StatusId = investigation.StatusId;
+                        _context.Update(inv);
+                        _context.Update(report);
+                        await _context.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        return Unauthorized();
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -253,9 +282,19 @@ namespace cis2055_NemesysProject.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ReportId"] = new SelectList(_context.Reports, "ReportId", "Description", investigation.ReportId);
-            ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email", investigation.UserId);
-            return View(investigation);
+            else
+            {
+                var statusList = _context.StatusCategories.ToList();
+
+                var model = new CreateInvestigationViewModel()
+                {
+                    InvestigationId = id,
+                    StatusId = inv.Report.StatusId,
+                    StatusList = statusList,
+                    Description = inv.Description,
+                };
+                return View(model);
+            }
         }
 
         // GET: Investigations/Delete/5

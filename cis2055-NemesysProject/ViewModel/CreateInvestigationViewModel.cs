@@ -20,5 +20,6 @@ namespace cis2055_NemesysProject.ViewModel
 
         public List<StatusCategory> StatusList { get; set; }
         public NemesysUser User { get; set; }
+        public LogInvestigation LogInvestigation { get; set; }
     }
 }

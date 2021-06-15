@@ -24,6 +24,6 @@ namespace cis2055_NemesysProject.ViewModel
         public HazardViewModel Hazard { get; set; }
         public StatusCategory Status { get; set; }
         public NemesysUser User { get; set; }
-        //public Investigation Investigation { get; set; }
+        public Investigation Investigation { get; set; }
     }
 }
