@@ -59,7 +59,14 @@ namespace cis2055_NemesysProject.Controllers
                     Status = new StatusCategory()
                     {
                         StatusId = r.Status.StatusId,
-                        StatusType = r.Status.StatusType
+                        StatusType = r.Status.StatusType    
+                    },
+                    User = new NemesysUser()
+                    {
+                        Id = _nemesysRepository.GetUserByReportId(r.ReportId).Id,
+                        UserName = _nemesysRepository.GetUserByReportId(r.ReportId).UserName,
+                        Email = _nemesysRepository.GetUserByReportId(r.ReportId).Email,
+                        AuthorAlias = _nemesysRepository.GetUserByReportId(r.ReportId).AuthorAlias
                     }
                 })
             };
@@ -75,7 +82,7 @@ namespace cis2055_NemesysProject.Controllers
             {
                 return NotFound();
             }
-
+            var reportInvestigation = _context.Investigations.FirstOrDefault(i => i.ReportId == id);
             var report = _nemesysRepository.GetReportById(id);
             if (report == null)
             {
@@ -107,9 +114,24 @@ namespace cis2055_NemesysProject.Controllers
                 User = new NemesysUser()
                 {
                     Id = report.UserId,
-                }
+                    UserName = report.User.UserName,
+                    PhoneNumber = report.User.PhoneNumber
+                },
+                
             };
-
+            if(reportInvestigation != null)
+            {
+                var user = _nemesysRepository.GetUserById(reportInvestigation.UserId);
+                model.Investigation = new Investigation()
+                {
+                    Description = reportInvestigation.Description,
+                    User = new NemesysUser()
+                    {
+                        UserName = reportInvestigation.User.UserName
+                    }
+                };
+            }
+            ViewData["ReportInvestigation"] = reportInvestigation;
 
             return View(model);
         }
@@ -166,7 +188,8 @@ namespace cis2055_NemesysProject.Controllers
                     Longitude = (double)report.Longitude,
                     Latitude = (double)report.Latitude,
                     StatusId = 1,
-                    HazardId = (int)report.HazardId
+                    HazardId = (int)report.HazardId,
+                    User = _userManager.GetUserAsync(User).Result
                 };
                 _context.Add(newReport);
                 await _context.SaveChangesAsync();

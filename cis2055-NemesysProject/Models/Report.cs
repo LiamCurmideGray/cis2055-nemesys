@@ -17,6 +17,7 @@ namespace cis2055_NemesysProject.Models
         }
 
         [Key]
+        [Display(Name = "Report ID")]
         public int ReportId { get; set; }
         [Display(Name = "Date of Report")]
         public DateTime DateOfReport { get; set; }
@@ -35,6 +36,7 @@ namespace cis2055_NemesysProject.Models
         //public Investigation Investigation { get; set; }
         public virtual StatusCategory Status { get; set; }
         public string UserId { get; set; }
+        [Display(Name = "Reporter")]
         public virtual NemesysUser User { get; set; }
         public virtual ICollection<Investigation> Investigations { get; set; }
         //public virtual ICollection<Hazard> Hazards { get; set; }

@@ -31,9 +31,22 @@ namespace cis2055_NemesysProject.Data.Repositories
         public IEnumerable<Report> GetAllReports()
         {
             try{
-                return _context.Reports.Include(r => r.Status).Include(r => r.Hazard).OrderBy(r => r.DateOfReport);
+                return _context.Reports.Include(r => r.Status).Include(r => r.Hazard).Include(r => r.User).OrderBy(r => r.DateOfReport);
             }
             catch(Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+
+        public IEnumerable<Investigation> GetAllInvestigations()
+        {
+            try
+            {
+                return _context.Investigations.Include(r => r.Report).Include(r => r.User).OrderBy(r => r.InvestigationId);
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
                 throw;
@@ -52,7 +65,7 @@ namespace cis2055_NemesysProject.Data.Repositories
                 throw;
             }
         }
-
+        
         public IEnumerable<Report> GetReportByUserId(string id)
         {
             try
@@ -64,6 +77,32 @@ namespace cis2055_NemesysProject.Data.Repositories
                 _logger.LogError(ex.Message);
                 throw;
             }
+        }
+        
+        public NemesysUser GetUserByReportId(int id)
+        {
+            var report = GetReportById(id);
+            var userId = report.UserId;
+            return _context.Users.FirstOrDefault(u => u.Id == userId);
+        }
+
+        public Investigation GetInvestigationById(int id)
+        {
+            try
+            {
+                return _context.Investigations.Include(r => r.Report).Include(r => r.User).Include(r => r.LogInvestigations).FirstOrDefault(p => p.InvestigationId == id);
+             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+        
+
+        public NemesysUser GetUserById(string id)
+        {
+            return _context.Users.FirstOrDefault(u => u.Id == id);
         }
 
         public IEnumerable<int> GetUpvotesReportByUserId(string id)
@@ -98,6 +137,5 @@ namespace cis2055_NemesysProject.Data.Repositories
             return null;
         }
 
-        
     }
 }

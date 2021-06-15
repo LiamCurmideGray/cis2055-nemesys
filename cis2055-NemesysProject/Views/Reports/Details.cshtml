@@ -1,7 +1,14 @@
 ﻿@model cis2055_NemesysProject.ViewModel.ReportDetailsViewModel
 
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<NemesysUser> UserManager
+
 @{
     ViewData["Title"] = "Details";
+
+    var user = await UserManager.GetUserAsync(User);
+    var role = await UserManager.GetRolesAsync(user);
+    var data = ViewData["ReportInvestigation"];
 }
 
 <h1>Details</h1>
@@ -52,7 +59,7 @@
                 @Html.DisplayNameFor(model => model.Image)
             </dt>
             <dd class="col-sm-10">
-                <img src="@Model.Image" width="500"/>
+                <img src="@Model.Image" width="500" />
             </dd>
         }
         <dt class="col-sm-2">
@@ -71,14 +78,37 @@
             Reporter
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.User.Id)
+            @Html.DisplayFor(model => model.User.UserName)
+            <br />
+            @Html.DisplayFor(model => model.User.PhoneNumber)
         </dd>
+        @if (Model.Investigation != null)
+        {
+            <dt class="col-sm-2">
+                Investigation
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Investigation.Description)
+                <br />
+                @Html.DisplayFor(model => model.Investigation.User.Email)
+            </dd>
+        }
     </dl>
 </div>
 <div id="map"></div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.ReportId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    @if (User.Identity.IsAuthenticated)
+    {
+        @if (Model.UserId.Equals(user.Id))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.ReportId">Edit |</a>
+        }
+        else if (User.IsInRole("Investigator") && data == null)
+        {
+            <a asp-action="Create" asp-controller="Investigations" asp-route-id="@Model.ReportId">Open Investigation |</a>
+        }
+        <a asp-action="Index">Back to List</a>
+    }
 </div>
 
 <link rel="stylesheet" href="~/css/map.css">
