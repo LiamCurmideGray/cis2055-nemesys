@@ -23,7 +23,7 @@
 <div class="row">
     @foreach (var report in Model.Reports)
     {
-        <div class="card" style="width: 18rem;padding:20px; margin:20px;">
+        <div class="card" style="width: 50rem;padding:10px; margin:0 auto; text-align:center">
 
             <div class="card-body">
                 <h3 class="card-title"><b>Status: </b>@report.Status.StatusType</h3>
@@ -36,11 +36,12 @@
                     <b>Hazard spotted:</b> @report.DateTimeHazard.ToShortDateString()<br />
                     <b>Type of hazard:</b> @report.Hazard.HazardType<br />
                     <b>Upvotes:</b> @report.Upvotes<br />
-                    <b>Description:</b> @report.Description
-                    <img src="@report.Image" width="200" style="text-align: center;" />
+                    <b>Description:</b> @report.Description <br />
+                    <img src="@report.Image" width="280" style="text-align: center;" /> 
                 </p>
+                @*<br />*@
                 <div class="button-container">
-                    <table>
+                    <table style="text-align:center">
 
                         <tr>
                             @if (User.Identity.IsAuthenticated)
@@ -61,8 +62,17 @@
                                     </td>
                                 }
 
-                            }
-                        </tr>
+
+                                @if (!report.UserId.Equals(user.Id) && User.IsInRole("Reporter"))
+                                {
+                                    <td>
+                                        <a asp-controller="Reports" asp-action="UpdateUpvote" asp-route-id="@report.ReportId" class="btn btn-outline-success">Upvote</a>
+                                        @*<a asp-controller="Reports" asp-action="UpdateUpvote" asp-route-id="@report.ReportId"  class="btn btn-outline-success">Delete</a>*@
+                                    </td>
+                                    }
+                                }
+                            </tr>
+
                     </table>
                 </div>
 

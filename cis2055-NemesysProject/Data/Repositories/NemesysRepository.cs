@@ -65,12 +65,51 @@ namespace cis2055_NemesysProject.Data.Repositories
                 throw;
             }
         }
+        
+        public IEnumerable<Report> GetReportByUserId(string id)
+        {
+            try
+            {
+                return _context.Reports.Include(r => r.Status).Include(r => r.User).Include(r => r.Hazard).Where(p => p.UserId == id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+        
+        public NemesysUser GetUserByReportId(int id)
+        {
+            var report = GetReportById(id);
+            var userId = report.UserId;
+            return _context.Users.FirstOrDefault(u => u.Id == userId);
+        }
 
         public Investigation GetInvestigationById(int id)
         {
             try
             {
                 return _context.Investigations.Include(r => r.Report).Include(r => r.User).Include(r => r.LogInvestigations).FirstOrDefault(p => p.InvestigationId == id);
+             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+        
+
+        public NemesysUser GetUserById(string id)
+        {
+            return _context.Users.FirstOrDefault(u => u.Id == id);
+        }
+
+        public IEnumerable<int> GetUpvotesReportByUserId(string id)
+        {
+            try
+            {
+                return _context.Reports.Include(r => r.Status).Include(r => r.User).Include(r => r.Hazard).Where(p => p.UserId == id).Select(r => r.Upvotes);
             }
             catch (Exception ex)
             {
@@ -79,16 +118,24 @@ namespace cis2055_NemesysProject.Data.Repositories
             }
         }
 
-        public NemesysUser GetUserByReportId(int id)
+        public Report UpdateReportUpVote (int reportId)
         {
-            var report = GetReportById(id);
-            var userId = report.UserId;
-            return _context.Users.FirstOrDefault(u => u.Id == userId);
+            try
+            {
+            Report report = GetReportById(reportId);
+            report.Upvotes++;
+
+            _context.Update(report);
+            _context.SaveChanges();
+
+            } catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+
+            return null;
         }
 
-        public NemesysUser GetUserById(string id)
-        {
-            return _context.Users.FirstOrDefault(u => u.Id == id);
-        }
     }
 }
