@@ -10,6 +10,9 @@ namespace cis2055_NemesysProject.Data.Interfaces
     {
         IEnumerable<Report> GetAllReports();
         Report GetReportById(int id);
+        IEnumerable<Report> GetReportByUserId(string id);
         Report UpdateReportUpVote(int reportId);
+
+      
     }
 }
