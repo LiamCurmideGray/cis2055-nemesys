@@ -1,0 +1,55 @@
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<NemesysUser> UserManager
+
+@model cis2055_NemesysProject.ViewModel.HallofFameViewModel
+
+
+
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+    ViewData["Title"] = "Hall of Fame";
+    var counter = 1;
+}
+
+
+<h2>Showing off top 3 Reporters!</h2>
+<div class="row">
+    @foreach (var userreport in Model.TotalReportsOfReporter.OrderByDescending(r => r.TotalReportsCount).Take(3))
+    {
+
+    <div class="card" style="width: 50rem;padding:10px; margin:0 auto; text-align:center">
+
+        <div class="card-body">
+            <h3 class="card-title"><b>Rank: </b>@counter</h3>
+            <p class="text-body">
+                <b>Reporter: </b>@userreport.AuthorAlias <br />
+                <b>Total Reports:</b> @userreport.TotalReportsCount<br />
+                <b>Total Upvotes:</b> @userreport.TotalUpvotesCount<br />
+                @{counter++;}
+            </p>
+        
+            <div class="button-container" style="text-align:match-parent">
+                <table style="text-align:center">
+                    <tr>
+                       @{ var repcounter = 1; }
+                        @foreach (var report in userreport.Top3Reports)
+                        {
+
+                            <td>
+                                <a asp-controller="Reports" asp-action="Details" asp-route-id="@report.ReportId" class="btn btn-outline-primary">
+                                    Report #@repcounter
+                                    <p>Upvotes: @report.Upvotes</p>
+                                    @*<img src="@report.Image" width="200" style="text-align: center;" />*@
+                                </a>
+                            </td>
+                           repcounter++; 
+                        }
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+        <br/>
+    }
+</div>

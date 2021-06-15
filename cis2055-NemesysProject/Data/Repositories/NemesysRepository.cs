@@ -53,6 +53,32 @@ namespace cis2055_NemesysProject.Data.Repositories
             }
         }
 
+        public IEnumerable<Report> GetReportByUserId(string id)
+        {
+            try
+            {
+                return _context.Reports.Include(r => r.Status).Include(r => r.User).Include(r => r.Hazard).Where(p => p.UserId == id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+
+        public IEnumerable<int> GetUpvotesReportByUserId(string id)
+        {
+            try
+            {
+                return _context.Reports.Include(r => r.Status).Include(r => r.User).Include(r => r.Hazard).Where(p => p.UserId == id).Select(r => r.Upvotes);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+
         public Report UpdateReportUpVote (int reportId)
         {
             try
@@ -71,6 +97,7 @@ namespace cis2055_NemesysProject.Data.Repositories
 
             return null;
         }
+
         
     }
 }
