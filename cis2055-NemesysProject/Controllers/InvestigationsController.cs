@@ -33,8 +33,32 @@ namespace cis2055_NemesysProject.Controllers
         // GET: Investigations
         public async Task<IActionResult> Index()
         {
-            var cis2055nemesysContext = _context.Investigations.Include(i => i.Report).Include(i => i.User);
-            return View(await cis2055nemesysContext.ToListAsync());
+            //var cis2055nemesysContext = _context.Investigations.Include(i => i.Report).Include(i => i.User);
+            var model = new InvestigationListViewModel()
+            {
+                TotalInvestigations = _nemesysRepository.GetAllInvestigations().Count(),
+                Investigations = _nemesysRepository.GetAllInvestigations().OrderByDescending(i => i.InvestigationId).Select(i => new InvestigationViewModel
+                {
+                    InvestigationId = i.InvestigationId,
+                    ReportId = i.ReportId,
+                    Report = new Report()
+                    {
+                        ReportId = i.Report.ReportId,
+                        Description = i.Report.Description,
+                        StatusId = i.Report.StatusId,
+                        UserId = i.Report.UserId,
+                        User = _userManager.FindByIdAsync(i.Report.UserId).Result
+                    },
+                    Description = i.Description,
+                    User = new NemesysUser()
+                    {
+                        Id = i.User.Id,
+                        UserName = i.User.UserName,
+                        AuthorAlias = i.User.AuthorAlias
+                    }
+                })
+            };
+            return View(model);
         }
 
         // GET: Investigations/Details/5
@@ -44,17 +68,58 @@ namespace cis2055_NemesysProject.Controllers
             {
                 return NotFound();
             }
-
+            var reportId = _context.Investigations.Where(i => i.InvestigationId == id).Select(i => i.ReportId).FirstOrDefault();
+            var reportInvestigation = _nemesysRepository.GetReportById(reportId);
             var investigation = await _context.Investigations
                 .Include(i => i.Report)
                 .Include(i => i.User)
                 .FirstOrDefaultAsync(m => m.InvestigationId == id);
+
+            var model = new InvestigationViewModel()
+            {
+                InvestigationId = investigation.InvestigationId,
+                    ReportId = investigation.ReportId,
+                    Report = new Report()
+                    {
+                        ReportId = investigation.Report.ReportId,
+                        Description = investigation.Report.Description,
+                        DateOfReport = investigation.Report.DateOfReport,
+                        Status = new StatusCategory()
+                        {
+                            StatusId = reportInvestigation.Status.StatusId,
+                            StatusType = reportInvestigation.Status.StatusType
+                        },
+                        Hazard = new Hazard()
+                        {
+                            HazardId = reportInvestigation.Hazard.HazardId,
+                            HazardType = reportInvestigation.Hazard.HazardType
+                        },
+                        User = new NemesysUser()
+                        {
+                            Id = reportInvestigation.User.Id,
+                            UserName = reportInvestigation.User.UserName,
+                            AuthorAlias = reportInvestigation.User.AuthorAlias,
+                            PhoneNumber = reportInvestigation.User.PhoneNumber,
+                            Email = reportInvestigation.User.Email
+                        },
+                        Image = reportInvestigation.Image
+                    },
+                    Description = investigation.Description,
+                    User = new NemesysUser()
+                    {
+                        Id = investigation.User.Id,
+                        UserName = investigation.User.UserName,
+                        AuthorAlias = investigation.User.AuthorAlias,
+                        PhoneNumber = investigation.User.PhoneNumber,
+                        Email = investigation.User.Email
+                    },
+            };
             if (investigation == null)
             {
                 return NotFound();
             }
 
-            return View(investigation);
+            return View(model);
         }
 
         [Authorize(Roles = "Investigator")]
@@ -96,13 +161,22 @@ namespace cis2055_NemesysProject.Controllers
             {
                 var reportInvestigation = _context.Investigations.FirstOrDefault(i => i.ReportId == id);
                 var report = _nemesysRepository.GetReportById(id);
+                var currUser = _userManager.GetUserAsync(User);
                 if (reportInvestigation == null)
                 {
                     var newInvestigation = new Investigation()
                     {
                         ReportId = id,
                         Description = investigation.Description,
-                        UserId = _userManager.GetUserId(User)
+                        UserId = _userManager.GetUserId(User),
+                        Report = new Report()
+                        {
+                            ReportId = report.ReportId,
+                            DateOfReport = report.DateOfReport,
+                            DateTimeHazard = report.DateTimeHazard,
+                            Description = report.Description,
+                            HazardId = report.HazardId
+                        }
                     };
                     report.StatusId = investigation.StatusId;
                     _context.Add(newInvestigation);

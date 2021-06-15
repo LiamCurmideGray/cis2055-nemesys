@@ -176,7 +176,8 @@ namespace cis2055_NemesysProject.Controllers
                     Longitude = (double)report.Longitude,
                     Latitude = (double)report.Latitude,
                     StatusId = 1,
-                    HazardId = (int)report.HazardId
+                    HazardId = (int)report.HazardId,
+                    User = _userManager.GetUserAsync(User).Result
                 };
                 _context.Add(newReport);
                 await _context.SaveChangesAsync();

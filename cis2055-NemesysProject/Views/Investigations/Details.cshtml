@@ -1,4 +1,4 @@
-﻿@model cis2055_NemesysProject.Models.Investigation
+﻿@model cis2055_NemesysProject.ViewModel.InvestigationViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -10,17 +10,58 @@
     <h4>Investigation</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
+            Investigation
+        </dt>
+        <dd class="col-sm-10">
+            <b>@Html.DisplayNameFor(model => model.InvestigationId) :</b>
+            @Html.DisplayFor(model => model.InvestigationId)
+            <br />
+            <b>@Html.DisplayNameFor(model => model.Description) :</b>
+            @Html.DisplayFor(model => model.Description)
+            <br />
+            <b>@Html.DisplayNameFor(model => model.User.Email) :</b>
+            @Html.DisplayFor(model => model.User.Email)
+            <br />
+            <b>@Html.DisplayNameFor(model => model.User.PhoneNumber) :</b>
+            @Html.DisplayFor(model => model.User.PhoneNumber)
+            <br />
+        </dd>
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Report)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
+            <b>@Html.DisplayNameFor(model => model.Report.ReportId) :</b>
+            @Html.DisplayFor(model => model.Report.ReportId)
+            <br />
+            <b>@Html.DisplayNameFor(model => model.Report.DateOfReport) :</b>
+            @Html.DisplayFor(model => model.Report.DateOfReport)
+            <br />
+            <b>@Html.DisplayNameFor(model => model.Report.DateTimeHazard) :</b>
+            @Html.DisplayFor(model => model.Report.DateTimeHazard)
+            <br />
+            <b>@Html.DisplayNameFor(model => model.Report.Description) :</b>
             @Html.DisplayFor(model => model.Report.Description)
+            <br />
+            <b>@Html.DisplayNameFor(model => model.Report.Status.StatusType) :</b>
+            @Html.DisplayFor(model => model.Report.Status.StatusType)
+            <br />
+            <b>@Html.DisplayNameFor(model => model.Report.Hazard.HazardType) :</b>
+            @Html.DisplayFor(model => model.Report.Hazard.HazardType)
+            <br />
+            <b>@Html.DisplayNameFor(model => model.Report.Image) :</b>
+            <img src="@Model.Report.Image" width="500" />
+            <br />
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.User)
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Report)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.User.Email)
+        <dd class="col-sm-10">
+            <b>@Html.DisplayNameFor(model => model.Report.User.Email) :</b>
+            @Html.DisplayFor(model => model.Report.User.Email)
+            <br />
+            <b>@Html.DisplayNameFor(model => model.Report.User.PhoneNumber) :</b>
+            @Html.DisplayFor(model => model.Report.User.PhoneNumber)
         </dd>
     </dl>
 </div>

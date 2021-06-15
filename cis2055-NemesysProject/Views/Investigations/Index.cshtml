@@ -1,6 +1,8 @@
-﻿@model IEnumerable<cis2055_NemesysProject.Models.Investigation>
+﻿@model cis2055_NemesysProject.ViewModel.InvestigationListViewModel
 
 @{
+    @using Microsoft.AspNetCore.Identity
+    @inject UserManager<NemesysUser> UserManager
     ViewData["Title"] = "Index";
 }
 
@@ -13,29 +15,43 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Report)
+                Investigation Description
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.User)
+                Report Description
             </th>
+            <th>
+                Investigator
+            </th>
+            <th>
+                Reporter
+            </th>
+
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Report.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Email)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.InvestigationId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.InvestigationId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.InvestigationId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.Investigations)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Report.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.User.AuthorAlias)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Report.User.AuthorAlias)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.InvestigationId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.InvestigationId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.InvestigationId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

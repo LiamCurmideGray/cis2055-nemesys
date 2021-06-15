@@ -40,6 +40,19 @@ namespace cis2055_NemesysProject.Data.Repositories
             }
         }
 
+        public IEnumerable<Investigation> GetAllInvestigations()
+        {
+            try
+            {
+                return _context.Investigations.Include(r => r.Report).Include(r => r.User).OrderBy(r => r.InvestigationId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+
         public Report GetReportById(int id)
         {
             try
