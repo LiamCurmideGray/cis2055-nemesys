@@ -19,5 +19,7 @@ namespace cis2055_NemesysProject.ViewModel
         [Display (Name = "Report")]
         public Report Report { get; set; }
         public Hazard Hazard { get; set; }
+
+        public IEnumerable<LogInvestigation> LogInvestigations { get; set; }
     }
 }

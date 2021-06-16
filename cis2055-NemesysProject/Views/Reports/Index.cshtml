@@ -10,16 +10,22 @@
 
 @{
     var user = await UserManager.GetUserAsync(User);
+    
+    
 }
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Reports Index</h1>
+@if (await UserManager.IsInRoleAsync(user, "Reporter"))
+{
+        <p>
+            <a asp-action="Create">Create New</a>
+        </p>
+    }
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<h3>Listing Reports by most recent</h3>
 <div class="row">
     @foreach (var report in Model.Reports)
     {
@@ -37,7 +43,7 @@
                     <b>Type of hazard:</b> @report.Hazard.HazardType<br />
                     <b>Upvotes:</b> @report.Upvotes<br />
                     <b>Description:</b> @report.Description <br />
-                    <img src="@report.Image" width="280" style="text-align: center;" /> 
+                    <img src="@report.Image" width="280" style="text-align: center;" />
                 </p>
                 @*<br />*@
                 <div class="button-container">
@@ -69,9 +75,9 @@
                                         <a asp-controller="Reports" asp-action="UpdateUpvote" asp-route-id="@report.ReportId" class="btn btn-outline-success">Upvote</a>
                                         @*<a asp-controller="Reports" asp-action="UpdateUpvote" asp-route-id="@report.ReportId"  class="btn btn-outline-success">Delete</a>*@
                                     </td>
-                                    }
                                 }
-                            </tr>
+                            }
+                        </tr>
 
                     </table>
                 </div>

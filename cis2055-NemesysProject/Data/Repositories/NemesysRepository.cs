@@ -98,6 +98,19 @@ namespace cis2055_NemesysProject.Data.Repositories
                 throw;
             }
         }
+
+        public IEnumerable<LogInvestigation> GetLogsOfInvestigation(int id)
+        {
+            try
+            {
+                return _context.LogInvestigations.Include(r => r.Investigation).Where(p => p.InvestigationId == id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
         
 
         public NemesysUser GetUserById(string id)

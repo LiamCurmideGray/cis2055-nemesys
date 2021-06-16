@@ -16,6 +16,7 @@ namespace cis2055_NemesysProject.Data.Interfaces
         NemesysUser GetUserById(string id);
         IEnumerable<Report> GetReportByUserId(string id);
         Report UpdateReportUpVote(int reportId);
+        IEnumerable<LogInvestigation> GetLogsOfInvestigation(int id);
 
     }
 }

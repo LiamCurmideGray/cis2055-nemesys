@@ -11,7 +11,10 @@ namespace cis2055_NemesysProject.Models
         [Key]
         public int LogInvestigationId { get; set; }
         public int InvestigationId { get; set; }
+        [Display(Name = "Log Description")]
         public string Description { get; set; }
+        [Display(Name = "Date of Action")]
+        [DataType(DataType.DateTime)]
         public DateTime DateOfAction { get; set; }
 
         public virtual Investigation Investigation { get; set; }

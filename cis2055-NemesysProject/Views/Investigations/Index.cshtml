@@ -4,13 +4,10 @@
     @using Microsoft.AspNetCore.Identity
     @inject UserManager<NemesysUser> UserManager
     ViewData["Title"] = "Index";
+    var userId = UserManager.GetUserId(User);
 }
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<h1>Investigations Index</h1>
 <table class="table">
     <thead>
         <tr>
@@ -47,10 +44,16 @@
                     @Html.DisplayFor(modelItem => item.Report.User.AuthorAlias)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.InvestigationId">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.InvestigationId">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.InvestigationId">Delete</a>
-                </td>
+                    @if (userId == item.User.Id)
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.InvestigationId">Add Log </a>
+                    }
+                    <a asp-action="Details" asp-route-id="@item.InvestigationId">| Details |</a>
+                    @if (userId == item.User.Id)
+                    {
+                        <a asp-action="Delete" asp-route-id="@item.InvestigationId">Delete</a>
+                    }
+                    </td>
             </tr>
         }
     </tbody>

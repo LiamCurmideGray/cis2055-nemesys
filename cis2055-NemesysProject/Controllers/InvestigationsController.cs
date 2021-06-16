@@ -30,7 +30,7 @@ namespace cis2055_NemesysProject.Controllers
             _nemesysRepository = nemesysRepository;
         }
 
-        [Authorize(Roles = "Investigator")]
+        [Authorize]
         // GET: Investigations
         public async Task<IActionResult> Index()
         {
@@ -62,9 +62,9 @@ namespace cis2055_NemesysProject.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "Investigator")]
+        [Authorize]
         // GET: Investigations/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
             if (id == null)
             {
@@ -77,10 +77,13 @@ namespace cis2055_NemesysProject.Controllers
                 .Include(i => i.User)
                 .FirstOrDefaultAsync(m => m.InvestigationId == id);
 
+            var logInvestigations = _nemesysRepository.GetLogsOfInvestigation(id);
+
             var model = new InvestigationViewModel()
             {
                 InvestigationId = investigation.InvestigationId,
                 ReportId = investigation.ReportId,
+                Description = investigation.Description,
                 Report = new Report()
                 {
                     ReportId = investigation.Report.ReportId,
@@ -107,7 +110,6 @@ namespace cis2055_NemesysProject.Controllers
                     },
                     Image = reportInvestigation.Image
                 },
-                Description = investigation.Description,
                 User = new NemesysUser()
                 {
                     Id = investigation.User.Id,
@@ -116,6 +118,7 @@ namespace cis2055_NemesysProject.Controllers
                     PhoneNumber = investigation.User.PhoneNumber,
                     Email = investigation.User.Email
                 },
+                LogInvestigations = logInvestigations
             };
             if (investigation == null)
             {
@@ -140,9 +143,10 @@ namespace cis2055_NemesysProject.Controllers
                 var model = new CreateInvestigationViewModel()
                 {
                     ReportId = id,
-                    StatusId = 1,
+                    StatusId = 3,
                     StatusList = statusList,
-                    User = _userManager.GetUserAsync(User).Result
+                    User = _userManager.GetUserAsync(User).Result,
+
                 };
                 return View(model);
             }
@@ -159,13 +163,13 @@ namespace cis2055_NemesysProject.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Investigator")]
-        public IActionResult Create(int id, [Bind("StatusId,Description")] CreateInvestigationViewModel investigation)
+        public IActionResult Create(int id, [Bind("StatusId,Description,LogDescription")] CreateInvestigationViewModel investigation)
         {
             if (ModelState.IsValid)
             {
                 var reportInvestigation = _context.Investigations.FirstOrDefault(i => i.ReportId == id);
                 var report = _nemesysRepository.GetReportById(id);
-                var currUser = _userManager.GetUserAsync(User);
+                //var currUser = _userManager.GetUserAsync(User);
                 if (reportInvestigation == null)
                 {
                     var newInvestigation = new Investigation()
@@ -173,15 +177,25 @@ namespace cis2055_NemesysProject.Controllers
                         ReportId = id,
                         Description = investigation.Description,
                         UserId = _userManager.GetUserId(User),
-                        Report = report,
-                        
+                        //Report = report,
+
                     };
+
                     report.StatusId = investigation.StatusId;
                     _context.Add(newInvestigation);
                     _context.SaveChanges();
-                    newInvestigation.User = _userManager.GetUserAsync(User).Result;
-                    _context.Update(newInvestigation);
+
+                    Investigation investigationId = _context.Investigations.FirstOrDefault(i => i.ReportId == id);
+                    LogInvestigation logInvestigation = new LogInvestigation()
+                    {
+                        InvestigationId = investigationId.InvestigationId,
+                        Description = investigation.LogDescription,
+                        DateOfAction = DateTime.Now
+                    };
+
+                    _context.Add(logInvestigation);
                     _context.SaveChanges();
+
 
                     return RedirectToAction(nameof(Index));
                 }
@@ -212,8 +226,10 @@ namespace cis2055_NemesysProject.Controllers
             {
                 return NotFound();
             }
+
             var investigation = _nemesysRepository.GetInvestigationById(id);
             var currUser = _userManager.GetUserId(User);
+            var loginvestigation = _nemesysRepository.GetLogsOfInvestigation(investigation.InvestigationId);
 
             if (currUser == investigation.UserId)
             {
@@ -225,6 +241,7 @@ namespace cis2055_NemesysProject.Controllers
                     StatusId = investigation.Report.StatusId,
                     StatusList = statusList,
                     Description = investigation.Description,
+                    LogInvestigation = loginvestigation
                 };
                 return View(model);
             }
@@ -240,7 +257,7 @@ namespace cis2055_NemesysProject.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Investigator")]
-        public async Task<IActionResult> Edit(int id, [Bind("StatusId,Description")] CreateInvestigationViewModel investigation)
+        public async Task<IActionResult> Edit(int id, [Bind("StatusId,Description,LogDescription")] CreateInvestigationViewModel investigation)
         {
             //if (id != investigation.InvestigationId)
             //{
@@ -259,10 +276,23 @@ namespace cis2055_NemesysProject.Controllers
                     {
                         inv.Description = investigation.Description;
                         report.StatusId = investigation.StatusId;
-                        //report.StatusId = investigation.StatusId;
                         _context.Update(inv);
                         _context.Update(report);
-                        await _context.SaveChangesAsync();
+
+                        //string datenow = DateTime.Now.ToString();
+                        ////var dateTime = DateTime.Parse(datenow);
+                        //int minute = DateTime.Now.Minute;
+                        //int hour = DateTime.Now.Hour;
+
+                        LogInvestigation log = new LogInvestigation()
+                        {
+                            InvestigationId = inv.InvestigationId,
+                            Description = investigation.LogDescription,
+                            DateOfAction = DateTime.Now
+
+                        };
+                        _context.Add(log);
+                        _context.SaveChanges();
                     }
                     else
                     {
@@ -298,6 +328,7 @@ namespace cis2055_NemesysProject.Controllers
         }
 
         // GET: Investigations/Delete/5
+        [Authorize(Roles = "Investigator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -309,22 +340,43 @@ namespace cis2055_NemesysProject.Controllers
                 .Include(i => i.Report)
                 .Include(i => i.User)
                 .FirstOrDefaultAsync(m => m.InvestigationId == id);
-            if (investigation == null)
-            {
-                return NotFound();
-            }
 
-            return View(investigation);
+            var currentuser = _userManager.GetUserAsync(User);
+            if (currentuser.Result.Id.Equals(investigation.UserId))
+            {
+                if (investigation == null)
+                {
+                    return NotFound();
+                }
+
+                return View(investigation);
+
+            }
+            else
+            {
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         // POST: Investigations/Delete/5
+        [Authorize(Roles = "Investigator")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var investigation = await _context.Investigations.FindAsync(id);
-            _context.Investigations.Remove(investigation);
-            await _context.SaveChangesAsync();
+            var currentuser = _userManager.GetUserAsync(User);
+            if (currentuser.Result.Id.Equals(investigation.UserId))
+            {
+                var logs = _nemesysRepository.GetLogsOfInvestigation(investigation.InvestigationId);
+
+                foreach(var item in logs)
+                {
+                _context.LogInvestigations.Remove(item);
+                }
+                _context.Investigations.Remove(investigation);
+                _context.SaveChanges();
+            }
             return RedirectToAction(nameof(Index));
         }
 
