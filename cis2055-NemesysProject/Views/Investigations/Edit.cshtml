@@ -25,6 +25,38 @@
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
+            <br />
+            <table style="padding-bottom:20px">
+                <thead>
+                    <tr>
+                        <th>
+                            Date of Action
+                        </th>
+                        <th>
+                            Log Description
+                        </th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var logs in Model.LogInvestigation)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => logs.DateOfAction)
+                            </td>
+                            <td style="padding-left:5px">
+                                @Html.DisplayFor(modelItem => logs.Description)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="form-group" style="padding-top:20px; margin-top: auto">
+                <label asp-for="LogDescription" class="control-label">New Log Description</label>
+                <input asp-for="LogDescription" class="form-control" />
+                <span asp-validation-for="LogDescription" class="text-danger"></span>
+            </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>

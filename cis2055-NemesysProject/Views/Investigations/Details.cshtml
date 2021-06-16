@@ -76,6 +76,26 @@
                 @Html.DisplayFor(model => model.Report.User.PhoneNumber)
             }
         </dd>
+        @if (Model.LogInvestigations != null)
+        {
+            var counter = 1;
+            @foreach (var log in Model.LogInvestigations)
+            {
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.LogInvestigations)# @counter
+                </dt>
+                <dd class="col-sm-10">
+                    <b>@Html.DisplayNameFor(r => log.DateOfAction) :</b>
+                    @Html.DisplayFor(r => log.DateOfAction)
+                    <br />
+                    <b>@Html.DisplayNameFor(r => log.Description) :</b>
+                    @Html.DisplayFor(r => log.Description)
+                </dd>
+                counter++;
+            }
+        }
+
+
     </dl>
 </div>
 <div>
@@ -84,7 +104,7 @@
         <a asp-controller="Reports" asp-action="Details" asp-route-id="@Model.ReportId">View Report Details</a>
         @if (Model.User.Id.Equals(user.Id))
         {
-            <a asp-action="Edit" asp-route-id="@Model.InvestigationId">| Edit |</a>
+            <a asp-action="Edit" asp-route-id="@Model.InvestigationId">| Add Log |</a>
         }
     }
     <a asp-action="Index">Back to List</a>
