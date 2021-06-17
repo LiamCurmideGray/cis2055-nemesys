@@ -31,19 +31,10 @@ namespace cis2055_NemesysProject
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<INemesysRepository, NemesysRepository>();
-            //services.AddMvc().AddJsonOptions();
-            //services.AddDistributedMemoryCache();
-            //services.AddSession(options =>
-            //{
-            //    options.IdleTimeout = TimeSpan.FromHours(1);
-            //});
-
-
+           
             services.AddDbContext<cis2055nemesysContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("NemesysContext")));
 
-            
             services.AddDefaultIdentity<NemesysUser>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = true;
@@ -68,12 +59,10 @@ namespace cis2055_NemesysProject
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<cis2055nemesysContext>();
 
-            services.AddTransient<IStatusCategoryRepository, StatusCategoryRepository>();
+            services.AddScoped<InterfaceInvestigationRepository, InvestigationRepository>();
+            services.AddScoped<IReportRepository, ReportRepository>();
 
-            services.AddControllersWithViews().AddRazorRuntimeCompilation(); //cannot find it .AddRazorRuntimeCompilation();
-            //services.AddRazorPages();
-
-
+            services.AddControllersWithViews().AddRazorRuntimeCompilation(); 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

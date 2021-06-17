@@ -1,4 +1,4 @@
-﻿@model cis2055_NemesysProject.ViewModel.InvestigationViewModel
+﻿@model cis2055_NemesysProject.Models.Investigation
 
 @using Microsoft.AspNetCore.Identity
 @inject UserManager<NemesysUser> UserManager
@@ -46,6 +46,9 @@
             <br />
             <b>@Html.DisplayNameFor(model => model.Report.DateTimeHazard) :</b>
             @Html.DisplayFor(model => model.Report.DateTimeHazard)
+            <br />
+            <b>@Html.DisplayNameFor(model => model.Report.Title) :</b>
+            @Html.DisplayFor(model => model.Report.Title)
             <br />
             <b>@Html.DisplayNameFor(model => model.Report.Description) :</b>
             @Html.DisplayFor(model => model.Report.Description)

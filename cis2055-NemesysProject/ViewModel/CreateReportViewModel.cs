@@ -22,8 +22,11 @@ namespace cis2055_NemesysProject.ViewModel
         public DateTime DateTimeHazard { get; set; } = System.DateTime.Today;
 
         public string Image { get; set; }
+        [Required(ErrorMessage = "Report Title cannot be empty.")]
+        public string Title { get; set; }
 
         [Required(ErrorMessage = "Report description cannot be empty.")]
+        [DataType(DataType.MultilineText)]
         public string Description { get; set; }
         [DataType(DataType.Upload)]
         [Display(Name = "Hazard Image")]
@@ -35,7 +38,7 @@ namespace cis2055_NemesysProject.ViewModel
         [Range(-180, 180, ErrorMessage = "Longitude has to be between -180 and 180")]
         public double? Longitude { get; set; }
 
-        public List<Hazard> HazardList { get; set; }
+        public IEnumerable<Hazard> HazardList { get; set; }
     }
 
     public class RestrictedDate : ValidationAttribute

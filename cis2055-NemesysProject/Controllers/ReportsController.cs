@@ -18,121 +18,50 @@ namespace cis2055_NemesysProject.Controllers
 {
     public class ReportsController : Controller
     {
-        private readonly cis2055nemesysContext _context;
-        private readonly INemesysRepository _nemesysRepository;
+        private readonly IReportRepository _reportRepository;
         private readonly ILogger<ReportsController> _logger;
 
         private readonly UserManager<NemesysUser> _userManager;
 
-        public ReportsController(cis2055nemesysContext context, UserManager<NemesysUser> userManager, INemesysRepository nemesysRepository, ILogger<ReportsController> logger)
+        public ReportsController(UserManager<NemesysUser> userManager, IReportRepository reportRepository, ILogger<ReportsController> logger)
         {
-            _context = context;
             _userManager = userManager;
-            _nemesysRepository = nemesysRepository;
+            _reportRepository = reportRepository;
             _logger = logger;
         }
 
         // GET: Reports
-        //[Authorize(Roles = "Admin")]
-        //[Authorize(Roles = "Reporter")]
         [Authorize]
         public IActionResult Index()
         {
+
             var model = new ReportListViewModel()
             {
-                TotalReports = _nemesysRepository.GetAllReports().Count(),
-                Reports = _nemesysRepository.GetAllReports().OrderByDescending(d => d.DateOfReport).Select(r => new ReportViewModel
-                {
-                    ReportId = r.ReportId,
-                    UserId = r.UserId,
-                    StatusId = r.StatusId,
-                    DateOfReport = r.DateOfReport,
-                    DateTimeHazard = r.DateTimeHazard,
-                    Description = r.Description,
-                    Upvotes = r.Upvotes,
-                    Image = r.Image,
-                    Hazard = new HazardViewModel()
-                    {
-                        HazardId = r.Hazard.HazardId,
-                        HazardType = r.Hazard.HazardType
-                    },
-                    Status = new StatusCategory()
-                    {
-                        StatusId = r.Status.StatusId,
-                        StatusType = r.Status.StatusType    
-                    },
-                    User = new NemesysUser()
-                    {
-                        Id = _nemesysRepository.GetUserByReportId(r.ReportId).Id,
-                        UserName = _nemesysRepository.GetUserByReportId(r.ReportId).UserName,
-                        Email = _nemesysRepository.GetUserByReportId(r.ReportId).Email,
-                        AuthorAlias = _nemesysRepository.GetUserByReportId(r.ReportId).AuthorAlias
-                    }
-                })
+                TotalReports = _reportRepository.GetAllReports().Count(),
+                Reports = _reportRepository.GetAllReports().OrderByDescending(d => d.DateOfReport),
+                StatusCategories = _reportRepository.GetAllStatusCategories(),
+                OwnReports = false
             };
-            //var cis2055nemesysContext = _context.Reports.Include(r => r.User);
             return View(model);
         }
 
-        // GET: Reports/Details/5
-        public async Task<IActionResult> Details(int id)
-
+        [Authorize]
+        public IActionResult MyReport(string id)
         {
-            if (id == null)
+            var model = new ReportListViewModel()
             {
-                return NotFound();
-            }
-            var reportInvestigation = _context.Investigations.FirstOrDefault(i => i.ReportId == id);
-            var report = _nemesysRepository.GetReportById(id);
-            if (report == null)
-            {
-                return NotFound();
-            }
-
-            var model = new ReportDetailsViewModel()
-            {
-                ReportId = report.ReportId,
-                UserId = report.UserId,
-                StatusId = report.StatusId,
-                DateOfReport = report.DateOfReport,
-                DateTimeHazard = report.DateTimeHazard,
-                Description = report.Description,
-                Upvotes = report.Upvotes,
-                Image = report.Image,
-                Latitude = report.Latitude,
-                Longitude = report.Longitude,
-                Hazard = new HazardViewModel()
-                {
-                    HazardId = report.Hazard.HazardId,
-                    HazardType = report.Hazard.HazardType,
-                },
-                Status = new StatusCategory()
-                {
-                    StatusId = report.Status.StatusId,
-                    StatusType = report.Status.StatusType
-                },
-                User = new NemesysUser()
-                {
-                    Id = report.UserId,
-                    UserName = report.User.UserName,
-                    PhoneNumber = report.User.PhoneNumber
-                },
-                
+                TotalReports = _reportRepository.GetAllReports().Count(),
+                Reports = _reportRepository.GetReportByUserId(id).OrderByDescending(d => d.DateOfReport),
+                StatusCategories = _reportRepository.GetAllStatusCategories(),
+                OwnReports = true
             };
-            if(reportInvestigation != null)
-            {
-                var user = _nemesysRepository.GetUserById(reportInvestigation.UserId);
-                model.Investigation = new Investigation()
-                {
-                    Description = reportInvestigation.Description,
-                    User = new NemesysUser()
-                    {
-                        UserName = reportInvestigation.User.UserName
-                    }
-                };
-            }
-            ViewData["ReportInvestigation"] = reportInvestigation;
+            return View("Index", model);
+        }
 
+        // GET: Reports/Details/5
+        public IActionResult Details(int id)
+        {
+            var model = _reportRepository.GetReportById(id);
             return View(model);
         }
 
@@ -140,14 +69,9 @@ namespace cis2055_NemesysProject.Controllers
         [Authorize(Roles = "Reporter")]
         public IActionResult Create()
         {
-            //ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email");
-            ViewData["HazardId"] = new SelectList(_context.Hazards, "HazardId", "HazardType");
-            var hazards = _context.Hazards.ToList();
-
-
             var model = new CreateReportViewModel()
             {
-                HazardList = hazards
+                HazardList = _reportRepository.GetAllHazard()
             };
             return View(model);
         }
@@ -158,51 +82,19 @@ namespace cis2055_NemesysProject.Controllers
         [HttpPost]
         [Authorize(Roles = "Reporter")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("HazardId,DateTimeHazard,Description,ImageToUpload,Latitude,Longitude")] CreateReportViewModel report)
+        public IActionResult Create([Bind("HazardId,DateTimeHazard,Title,Description,ImageToUpload,Latitude,Longitude")] CreateReportViewModel report)
         {
             if (ModelState.IsValid)
             {
-                string imageUrl = "";
-                string fileName = "";
-                if (report.ImageToUpload != null)
-                {
-
-                    var extension = "." + report.ImageToUpload.FileName.Split('.')[report.ImageToUpload.FileName.Split('.').Length - 1];
-                    fileName = Guid.NewGuid().ToString() + extension;
-                    var path = Directory.GetCurrentDirectory() + "\\wwwroot\\images\\reports\\" + fileName;
-                    using (var bits = new FileStream(path, FileMode.Create))
-                    {
-                        report.ImageToUpload.CopyTo(bits);
-                    }
-                    imageUrl = "/images/reports/" + fileName;
-                }
-
-                Report newReport = new Report()
-                {
-                    UserId = _userManager.GetUserId(User),
-                    DateOfReport = DateTime.UtcNow,
-                    DateTimeHazard = report.DateTimeHazard,
-                    Description = report.Description,
-                    Upvotes = 0,
-                    Image = imageUrl,
-                    Longitude = (double)report.Longitude,
-                    Latitude = (double)report.Latitude,
-                    StatusId = 1,
-                    HazardId = (int)report.HazardId,
-                    User = _userManager.GetUserAsync(User).Result
-                };
-                _context.Add(newReport);
-                await _context.SaveChangesAsync();
+                report.UserId = _userManager.GetUserId(User);
+                _reportRepository.AddReport(report);
                 return RedirectToAction(nameof(Index));
             }
             else
             {
-                //ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email");
-                var hazards = _context.Hazards.ToList();
-
                 var model = new CreateReportViewModel()
                 {
-                    HazardList = hazards
+                    HazardList = _reportRepository.GetAllHazard()
                 };
                 return View(model);
             }
@@ -210,20 +102,14 @@ namespace cis2055_NemesysProject.Controllers
 
         // GET: Reports/Edit/5
         [Authorize(Roles = "Reporter")]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
+            if (id == 0)
             {
                 return NotFound();
             }
 
-            var report = await _context.Reports.FindAsync(id);
-            var hazards = _context.Hazards.ToList();
-            if (report == null)
-            {
-                return NotFound();
-            }
-
+            var report = _reportRepository.GetReportById(id);
             var currentUser = await _userManager.GetUserAsync(User);
             if (report.UserId == currentUser.Id)
             {
@@ -233,11 +119,12 @@ namespace cis2055_NemesysProject.Controllers
                     UserId = report.User.Id,
                     HazardId = report.HazardId,
                     DateTimeHazard = report.DateTimeHazard,
+                    Title = report.Title,
                     Description = report.Description,
                     Image = report.Image,
                     Longitude = report.Longitude,
                     Latitude = report.Latitude,
-                    HazardList = hazards,
+                    HazardList = _reportRepository.GetAllHazard()
                 };
                 return View(model);
             }
@@ -255,81 +142,22 @@ namespace cis2055_NemesysProject.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Reporter")]
-        public async Task<IActionResult> Edit(int id, [Bind("HazardId,DateTimeHazard,Description,ImageToUpload,Latitude,Longitude")] CreateReportViewModel report)
+        public async Task<IActionResult> Edit(int id, [Bind("UserId,HazardId,DateTimeHazard,Title,Description,ImageToUpload,Latitude,Longitude")] CreateReportViewModel report)
         {
-            var modelToUpdate = await _context.Reports.FindAsync(id);
-            var currentUser = await _userManager.GetUserAsync(User);
 
-            if (modelToUpdate == null)
+            if (ModelState.IsValid)
             {
-                return NotFound();
-            }
-
-            if (modelToUpdate.User.Id == currentUser.Id)
-            {
-
-                if (ModelState.IsValid)
+                report.ReportId = id;
+                var currentUser = await _userManager.GetUserAsync(User);
+                bool result = _reportRepository.UpdateReport(report, currentUser.Id);
+                if (result)
                 {
-                    try
-                    {
-                        //var reportHazardId = _context.ReportHazards.Where(r => r.ReportId == id).Select(i => i.HazardId).FirstOrDefault();
-                        //var reportHazard = _context.ReportHazards.Find(reportHazardId, id);
-                       
-                        string fileName = "";
-                        string imageUrl = "";
-                        if (report.ImageToUpload != null)
-                        {
-
-                            var extension = "." + report.ImageToUpload.FileName.Split('.')[report.ImageToUpload.FileName.Split('.').Length - 1];
-                            fileName = Guid.NewGuid().ToString() + extension;
-                            var path = Directory.GetCurrentDirectory() + "\\wwwroot\\images\\reports\\" + fileName;
-                            using (var bits = new FileStream(path, FileMode.Create))
-                            {
-                                report.ImageToUpload.CopyTo(bits);
-                            }
-                            imageUrl = "/images/reports/" + fileName;
-                        }
-                        else
-                        {
-                            imageUrl = modelToUpdate.Image;
-                        }
-                        modelToUpdate.DateTimeHazard = report.DateTimeHazard;
-                        modelToUpdate.Description = report.Description;
-                        modelToUpdate.Image = imageUrl;
-                        modelToUpdate.Latitude = (double)report.Latitude;
-                        modelToUpdate.Longitude = (double)report.Longitude;
-                        modelToUpdate.HazardId = (int)report.HazardId;
-
-                        
-                        _context.Update(modelToUpdate);
-                        await _context.SaveChangesAsync();
-                    }
-                    catch (DbUpdateConcurrencyException)
-                    {
-                        if (!ReportExists(report.ReportId))
-                        {
-                            return NotFound();
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
                     return RedirectToAction(nameof(Index));
                 }
                 else
                 {
-                    //ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email");
-                    var hazards = _context.Hazards.ToList();
-
-                    var model = new CreateReportViewModel()
-                    {
-                        HazardList = hazards
-                    };
-                    return View(model);
+                    return View(report);
                 }
-                //ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email", report.UserId);
-                //return View(report);
             }
             else
             {
@@ -339,27 +167,21 @@ namespace cis2055_NemesysProject.Controllers
 
         // GET: Reports/Delete/5
         [Authorize(Roles = "Reporter")]
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-                var report = await _context.Reports
-                .Include(r => r.User)
-                .FirstOrDefaultAsync(m => m.ReportId == id);
+            var report = _reportRepository.GetReportById(id);
             if (report == null)
             {
-                return NotFound();
+             return RedirectToAction(nameof(Index));
             }
 
             var currentUser = await _userManager.GetUserAsync(User);
             if (report.User.Id == currentUser.Id)
             {
-            return View(report);
+                return View(report);
 
-            } else
+            }
+            else
             {
                 return Unauthorized();
             }
@@ -372,26 +194,13 @@ namespace cis2055_NemesysProject.Controllers
         [Authorize(Roles = "Reporter")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            //List<ReportHazard> reportHazards = _context.ReportHazards.Where(e => e.ReportId == id).ToList();
-
-            //foreach (var item in reportHazards)
-            //{
-            //    _context.Remove(item);
-            //}
-
-            var report = await _context.Reports.FindAsync(id);
-
             var currentUser = await _userManager.GetUserAsync(User);
-            if (report.User.Id == currentUser.Id)
+            bool result = _reportRepository.DeleteReport(id, currentUser.Id);
+            if (result)
             {
-            if (report.Image != "") {
-                System.IO.File.Delete("wwwroot" + report.Image);
-             }
-            _context.Reports.Remove(report);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-
-            } else
+                return RedirectToAction(nameof(Index));
+            }
+            else
             {
                 return Unauthorized();
             }
@@ -399,23 +208,20 @@ namespace cis2055_NemesysProject.Controllers
 
         //[HttpPost]
         //[ValidateAntiForgeryToken]
-        [Authorize (Roles = "Reporter")]
-        public  IActionResult UpdateUpvote(int id)
+        [Authorize(Roles = "Reporter")]
+        public IActionResult UpdateUpvote(int id)
         {
-            Report report = _nemesysRepository.GetReportById(id);
+            Report report = _reportRepository.GetReportById(id);
             string userId = _userManager.GetUserId(User);
 
-           if(!report.UserId.Equals(userId))
+            if (!report.UserId.Equals(userId))
             {
-            _nemesysRepository.UpdateReportUpVote(id);
+                _reportRepository.UpdateReportUpVote(id);
             }
 
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ReportExists(int id)
-        {
-            return _context.Reports.Any(e => e.ReportId == id);
-        }
+      
     }
 }

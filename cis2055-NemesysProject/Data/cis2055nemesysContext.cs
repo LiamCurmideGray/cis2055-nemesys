@@ -51,11 +51,13 @@ namespace cis2055_NemesysProject.Data
 
                 entity.Property(e => e.UserId).HasColumnName("User_ID");
 
-                entity.HasOne(d => d.Report)
-                    .WithMany(p => p.Investigations)
-                    .HasForeignKey(d => d.ReportId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Investigations_Reports");
+                entity.HasOne(s => s.Report)
+                   .WithOne(a => a.Investigation)
+                   .HasForeignKey<Investigation>(r => r.ReportId)
+                   .OnDelete(DeleteBehavior.ClientSetNull)
+                   .HasConstraintName("FK_Investigations_Reports");
+
+
             });
 
             modelBuilder.Entity<LogInvestigation>(entity =>
@@ -88,6 +90,10 @@ namespace cis2055_NemesysProject.Data
                 entity.Property(e => e.DateTimeHazard).HasColumnType("smalldatetime");
 
                 entity.Property(e => e.StatusId).HasColumnName("Status_ID");
+                
+                entity.Property(e => e.Title)
+                    .IsRequired()
+                    .HasColumnType("nvarchar(50)");
 
                 entity.Property(e => e.Description)
                     .IsRequired()
@@ -115,6 +121,12 @@ namespace cis2055_NemesysProject.Data
                     .HasForeignKey(d => d.StatusId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Reports_StatusCategory");
+
+                entity.HasOne(s => s.Investigation)
+                    .WithOne(a => a.Report)
+                    .HasForeignKey<Investigation>(r => r.ReportId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Investigations_Reports");
             });
 
             

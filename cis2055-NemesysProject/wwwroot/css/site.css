@@ -33,6 +33,7 @@ a {
   color: #fff;
   background-color: #1b6ec2;
   border-color: #1861ac;
+  cursor: pointer
 }
 
 /* Sticky footer styles
@@ -84,3 +85,4 @@ body {
 .pb-3 {
     position: center;
 }
+

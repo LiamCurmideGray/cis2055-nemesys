@@ -38,7 +38,7 @@
 
                             <td>
                                 <a asp-controller="Reports" asp-action="Details" asp-route-id="@report.ReportId" class="btn btn-outline-primary">
-                                    Report #@repcounter
+                                    Report: @report.Title
                                     <p>Upvotes: @report.Upvotes</p>
                                     @*<img src="@report.Image" width="200" style="text-align: center;" />*@
                                 </a>

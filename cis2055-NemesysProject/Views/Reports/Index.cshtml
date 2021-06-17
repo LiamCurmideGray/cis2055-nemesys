@@ -10,26 +10,60 @@
 
 @{
     var user = await UserManager.GetUserAsync(User);
-    
-    
+
+
 }
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Reports Index</h1>
-@if (await UserManager.IsInRoleAsync(user, "Reporter"))
-{
-        <p>
-            <a asp-action="Create">Create New</a>
-        </p>
+@if (Model.OwnReports == false)
+    {
+    <h1 style="text-align:center">Reports Page: All</h1>
     }
+    else
+    {
+    <h1 style="text-align:center">Reports Page: @user.AuthorAlias</h1>
 
-<h3>Listing Reports by most recent</h3>
+    }
+<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+    <div class="container">
+        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+            <ul class="navbar-nav flex-grow-1">
+                @if (await UserManager.IsInRoleAsync(user, "Reporter"))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-action="Create" asp-area="Reports">| Create New Report |</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-action="MyReport" asp-controller="Reports" asp-route-id="@user.Id">| My Reports |</a>
+                    </li>
+                }
+
+                <li class="nav-item">
+                    <p class="nav-link text-dark"> Filter Status By: </p>
+                </li>
+                <li class="nav-item" onclick="filterStatuses('all')">
+                    <a class="nav-link text-danger">Show All</a>
+                </li>
+                @foreach (var item in Model.StatusCategories)
+                {
+                    <li class="nav-item" onclick="filterStatuses('@item.StatusType')">
+                        <a class="nav-link text-danger" >@item.StatusType</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+
+<h3 style="text-align:center">Listing Reports by most recent Created Report</h3>
 <div class="row">
     @foreach (var report in Model.Reports)
     {
-        <div class="card" style="width: 50rem;padding:10px; margin:0 auto; text-align:center">
+        <div class="card @report.Status.StatusType" ; style="width: 50rem;padding:10px; margin:0 auto; text-align:center">
 
             <div class="card-body">
                 <h3 class="card-title"><b>Status: </b>@report.Status.StatusType</h3>
@@ -42,7 +76,7 @@
                     <b>Hazard spotted:</b> @report.DateTimeHazard.ToShortDateString()<br />
                     <b>Type of hazard:</b> @report.Hazard.HazardType<br />
                     <b>Upvotes:</b> @report.Upvotes<br />
-                    <b>Description:</b> @report.Description <br />
+                    <b>Title:</b> @report.Title <br />
                     <img src="@report.Image" width="280" style="text-align: center;" />
                 </p>
                 @*<br />*@
