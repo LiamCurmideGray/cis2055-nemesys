@@ -12,7 +12,7 @@ namespace cis2055_NemesysProject.Models
         public Report()
         {
             //Hazards = new HashSet<Hazard>();
-            Investigations = new HashSet<Investigation>();
+            //Investigations = new HashSet<Investigation>();
             //ReportHazards = new HashSet<ReportHazard>();
         }
 
@@ -27,7 +27,7 @@ namespace cis2055_NemesysProject.Models
         public string Description { get; set; }
         public int Upvotes { get; set; }
         public string Image { get; set; }
-
+        public string Title { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public int StatusId { get; set; }
@@ -38,7 +38,8 @@ namespace cis2055_NemesysProject.Models
         public string UserId { get; set; }
         [Display(Name = "Reporter")]
         public virtual NemesysUser User { get; set; }
-        public virtual ICollection<Investigation> Investigations { get; set; }
+        public virtual Investigation Investigation { get; set; }
+        //public virtual ICollection<Investigation> Investigations { get; set; }
         //public virtual ICollection<Hazard> Hazards { get; set; }
         //public virtual ICollection<ReportHazard> ReportHazards { get; set; }
     }

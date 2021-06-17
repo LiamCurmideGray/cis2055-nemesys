@@ -19,126 +19,62 @@ namespace cis2055_NemesysProject.Controllers
     {
         private readonly cis2055nemesysContext _context;
         private readonly UserManager<NemesysUser> _userManager;
-        private readonly INemesysRepository _nemesysRepository;
+        private readonly InterfaceInvestigationRepository _investigationRepository;
+        private readonly IReportRepository _reportRepository;
         private readonly ILogger<ReportsController> _logger;
 
-        public InvestigationsController(cis2055nemesysContext context, UserManager<NemesysUser> userManager, INemesysRepository nemesysRepository, ILogger<ReportsController> logger)
+        public InvestigationsController(cis2055nemesysContext context, UserManager<NemesysUser> userManager, IReportRepository reportRepository ,
+            InterfaceInvestigationRepository investigationRepository, ILogger<ReportsController> logger)
         {
             _context = context;
             _userManager = userManager;
             _logger = logger;
-            _nemesysRepository = nemesysRepository;
+            _investigationRepository = investigationRepository;
+            _reportRepository = reportRepository;
         }
 
         [Authorize]
         // GET: Investigations
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             //var cis2055nemesysContext = _context.Investigations.Include(i => i.Report).Include(i => i.User);
             var model = new InvestigationListViewModel()
             {
-                TotalInvestigations = _nemesysRepository.GetAllInvestigations().Count(),
-                Investigations = _nemesysRepository.GetAllInvestigations().OrderByDescending(i => i.InvestigationId).Select(i => new InvestigationViewModel
-                {
-                    InvestigationId = i.InvestigationId,
-                    ReportId = i.ReportId,
-                    Report = new Report()
-                    {
-                        ReportId = i.Report.ReportId,
-                        Description = i.Report.Description,
-                        StatusId = i.Report.StatusId,
-                        UserId = i.Report.UserId,
-                        User = _userManager.FindByIdAsync(i.Report.UserId).Result
-                    },
-                    Description = i.Description,
-                    User = new NemesysUser()
-                    {
-                        Id = i.User.Id,
-                        UserName = i.User.UserName,
-                        AuthorAlias = i.User.AuthorAlias
-                    }
-                })
+                TotalInvestigations = _investigationRepository.GetAllInvestigations().Count(),
+                Investigations = _investigationRepository.GetAllInvestigations().OrderByDescending(i => i.InvestigationId)
             };
             return View(model);
         }
 
         [Authorize]
         // GET: Investigations/Details/5
-        public async Task<IActionResult> Details(int id)
+        public IActionResult Details(int id)
         {
-            if (id == null)
+            if (id == 0)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Index));
             }
-            var reportId = _context.Investigations.Where(i => i.InvestigationId == id).Select(i => i.ReportId).FirstOrDefault();
-            var reportInvestigation = _nemesysRepository.GetReportById(reportId);
-            var investigation = await _context.Investigations
-                .Include(i => i.Report)
-                .Include(i => i.User)
-                .FirstOrDefaultAsync(m => m.InvestigationId == id);
 
-            var logInvestigations = _nemesysRepository.GetLogsOfInvestigation(id);
-
-            var model = new InvestigationViewModel()
-            {
-                InvestigationId = investigation.InvestigationId,
-                ReportId = investigation.ReportId,
-                Description = investigation.Description,
-                Report = new Report()
-                {
-                    ReportId = investigation.Report.ReportId,
-                    Description = investigation.Report.Description,
-                    DateOfReport = investigation.Report.DateOfReport,
-                    DateTimeHazard = reportInvestigation.DateTimeHazard,
-                    Status = new StatusCategory()
-                    {
-                        StatusId = reportInvestigation.Status.StatusId,
-                        StatusType = reportInvestigation.Status.StatusType
-                    },
-                    Hazard = new Hazard()
-                    {
-                        HazardId = reportInvestigation.Hazard.HazardId,
-                        HazardType = reportInvestigation.Hazard.HazardType
-                    },
-                    User = new NemesysUser()
-                    {
-                        Id = reportInvestigation.User.Id,
-                        UserName = reportInvestigation.User.UserName,
-                        AuthorAlias = reportInvestigation.User.AuthorAlias,
-                        PhoneNumber = reportInvestigation.User.PhoneNumber,
-                        Email = reportInvestigation.User.Email
-                    },
-                    Image = reportInvestigation.Image
-                },
-                User = new NemesysUser()
-                {
-                    Id = investigation.User.Id,
-                    UserName = investigation.User.UserName,
-                    AuthorAlias = investigation.User.AuthorAlias,
-                    PhoneNumber = investigation.User.PhoneNumber,
-                    Email = investigation.User.Email
-                },
-                LogInvestigations = logInvestigations
-            };
+            var investigation = _investigationRepository.GetInvestigationById(id);
+           
             if (investigation == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Index));
+                //nneds report user, report hazard, report status
             }
 
-            return View(model);
+            return View(investigation);
         }
 
         [Authorize(Roles = "Investigator")]
         // GET: Investigations/Create
         public IActionResult Create(int id)
         {
-            //ViewData["ReportId"] = new SelectList(_context.Reports, "ReportId", "Description");
-            //ViewData["UserId"] = new SelectList(_context.Users, "UserId", "Email");
-            //ViewData["StatusId"] = new SelectList(_context.StatusCategories, "StatusId", "StatusType");
-            var reportInvestigation = _context.Investigations.FirstOrDefault(i => i.ReportId == id);
+           
+            var reportInvestigation = _reportRepository.GetReportById(id);
             if (reportInvestigation == null)
             {
-                var statusList = _context.StatusCategories.ToList();
+                var statusList = _reportRepository.GetAllStatusCategories();
 
                 var model = new CreateInvestigationViewModel()
                 {
@@ -168,7 +104,7 @@ namespace cis2055_NemesysProject.Controllers
             if (ModelState.IsValid)
             {
                 var reportInvestigation = _context.Investigations.FirstOrDefault(i => i.ReportId == id);
-                var report = _nemesysRepository.GetReportById(id);
+                var report = _reportRepository.GetReportById(id);
                 //var currUser = _userManager.GetUserAsync(User);
                 if (reportInvestigation == null)
                 {
@@ -227,9 +163,9 @@ namespace cis2055_NemesysProject.Controllers
                 return NotFound();
             }
 
-            var investigation = _nemesysRepository.GetInvestigationById(id);
+            var investigation = _investigationRepository.GetInvestigationById(id);
             var currUser = _userManager.GetUserId(User);
-            var loginvestigation = _nemesysRepository.GetLogsOfInvestigation(investigation.InvestigationId);
+            var loginvestigation = _investigationRepository.GetLogsOfInvestigation(investigation.InvestigationId);
 
             if (currUser == investigation.UserId)
             {
@@ -263,9 +199,9 @@ namespace cis2055_NemesysProject.Controllers
             //{
             //    return NotFound();
             //}
-            var inv = _nemesysRepository.GetInvestigationById(id);
+            var inv = _investigationRepository.GetInvestigationById(id);
             var reportId = inv.ReportId;
-            var report = _nemesysRepository.GetReportById(reportId);
+            var report = _reportRepository.GetReportById(reportId);
             var currUser = _userManager.GetUserId(User);
 
             if (ModelState.IsValid)
@@ -368,7 +304,7 @@ namespace cis2055_NemesysProject.Controllers
             var currentuser = _userManager.GetUserAsync(User);
             if (currentuser.Result.Id.Equals(investigation.UserId))
             {
-                var logs = _nemesysRepository.GetLogsOfInvestigation(investigation.InvestigationId);
+                var logs = _investigationRepository.GetLogsOfInvestigation(investigation.InvestigationId);
 
                 foreach(var item in logs)
                 {

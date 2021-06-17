@@ -17,14 +17,12 @@ namespace cis2055_NemesysProject.Controllers
 {
     public class HallofFameController : Controller
     {
-        private readonly cis2055nemesysContext _context;
-        private readonly INemesysRepository _nemesysRepository;
+        private readonly IReportRepository _reportRepository;
         private readonly UserManager<NemesysUser> _usermanager;
 
-        public HallofFameController(cis2055nemesysContext context, INemesysRepository nemesysRepository, UserManager<NemesysUser> userManager)
+        public HallofFameController( IReportRepository reportRepository, UserManager<NemesysUser> userManager)
         {
-            _context = context;
-            _nemesysRepository = nemesysRepository;
+            _reportRepository = reportRepository;
             _usermanager = userManager;
         }
 
@@ -32,7 +30,7 @@ namespace cis2055_NemesysProject.Controllers
         [Authorize]
         public ActionResult Index()
         {
-            IEnumerable<Report> reports = _nemesysRepository.GetAllReports();
+            IEnumerable<Report> reports = _reportRepository.GetAllReports();
             List<HallofFameListViewModel> reportsPerUser = new List<HallofFameListViewModel>();
             List<string> UserId = new List<string>();
 
@@ -43,9 +41,10 @@ namespace cis2055_NemesysProject.Controllers
                     HallofFameListViewModel hallofFameListViewModel = new HallofFameListViewModel();
                     hallofFameListViewModel.UserIds = item.UserId;
                     hallofFameListViewModel.AuthorAlias = _usermanager.FindByIdAsync(item.UserId).Result.AuthorAlias;
-                    hallofFameListViewModel.TotalReportsCount = _nemesysRepository.GetReportByUserId(item.UserId).Count();
+                    hallofFameListViewModel.TotalReportsCount = _reportRepository.GetReportByUserId(item.UserId).Count();
                     hallofFameListViewModel.TotalUpvotesCount = 0;
-                    hallofFameListViewModel.Top3Reports = _nemesysRepository.GetReportByUserId(item.UserId).OrderByDescending(u => u.Upvotes).Take(3);
+                    hallofFameListViewModel.Top3Reports = _reportRepository.GetReportByUserId(item.UserId).OrderByDescending(u => u.Upvotes).Take(3);
+
                     foreach(var p in reports.Where(r => r.UserId.Equals(hallofFameListViewModel.UserIds)))
                     {
                         hallofFameListViewModel.TotalUpvotesCount += p.Upvotes;
@@ -55,8 +54,6 @@ namespace cis2055_NemesysProject.Controllers
 
                     UserId.Add(item.UserId);
                 } 
-                
-               
             }
 
             var model = new HallofFameViewModel()

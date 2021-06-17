@@ -18,7 +18,7 @@ namespace cis2055_NemesysProject.ViewModel
         [Required(ErrorMessage = "Status must be selected")]
         public int StatusId { get; set; }
 
-        public List<StatusCategory> StatusList { get; set; }
+        public IEnumerable<StatusCategory> StatusList { get; set; }
         public NemesysUser User { get; set; }
         public string LogDescription { get; set; }
         public IEnumerable<LogInvestigation> LogInvestigation { get; set; }
