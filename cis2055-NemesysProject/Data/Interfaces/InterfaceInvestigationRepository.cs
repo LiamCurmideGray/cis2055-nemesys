@@ -14,6 +14,7 @@ namespace cis2055_NemesysProject.Data.Interfaces
         Investigation GetInvestigationById(int id);
        
         IEnumerable<LogInvestigation> GetLogsOfInvestigation(int id);
+        Investigation GetInvestigationByReportId(int id);
 
 
     }

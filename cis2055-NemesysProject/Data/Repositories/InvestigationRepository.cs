@@ -38,7 +38,7 @@ namespace cis2055_NemesysProject.Data.Repositories
         {
             try
             {
-                return _context.Investigations.Include(r => r.Report).Include(r => r.User).OrderBy(r => r.InvestigationId);
+                return _context.Investigations.Include(r => r.Report).Include(r => r.User).Include(r => r.Report.User).OrderBy(r => r.InvestigationId);
             }
             catch (Exception ex)
             {
@@ -64,6 +64,21 @@ namespace cis2055_NemesysProject.Data.Repositories
                 throw;
             }
         }
+
+
+        public Investigation GetInvestigationByReportId(int id)
+        {
+            try
+            {
+               return _context.Investigations.Include(r => r.Report).Include(r => r.User).Include(r => r.LogInvestigations).FirstOrDefault(p => p.ReportId == id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+
 
         public IEnumerable<LogInvestigation> GetLogsOfInvestigation(int id)
         {
