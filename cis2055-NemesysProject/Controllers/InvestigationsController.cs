@@ -71,7 +71,7 @@ namespace cis2055_NemesysProject.Controllers
         public IActionResult Create(int id)
         {
            
-            var reportInvestigation = _reportRepository.GetReportById(id);
+            var reportInvestigation = _investigationRepository.GetInvestigationByReportId(id);
             if (reportInvestigation == null)
             {
                 var statusList = _reportRepository.GetAllStatusCategories();
