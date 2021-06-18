@@ -11,6 +11,8 @@ namespace cis2055_NemesysProject.ViewModel
     {
         public int InvestigationId { get; set; }
         public int ReportId { get; set; }
+        [Display (Name = "Report Title")]
+        public string ReportTitle { get; set; }
         [Required(ErrorMessage = "Investigation description cannot be empty.")]
         public string Description { get; set; }
         public string UserId { get; set; }
@@ -20,6 +22,7 @@ namespace cis2055_NemesysProject.ViewModel
 
         public IEnumerable<StatusCategory> StatusList { get; set; }
         public NemesysUser User { get; set; }
+        [Required(ErrorMessage = "Log description is required")]
         public string LogDescription { get; set; }
         public IEnumerable<LogInvestigation> LogInvestigation { get; set; }
     }

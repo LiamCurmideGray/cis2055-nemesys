@@ -62,7 +62,7 @@
             @if (Model.Report.Image != "")
             {
                 <b>@Html.DisplayNameFor(model => model.Report.Image) :</b>
-                <img src="@Model.Report.Image" width="500" />
+                <img src="@Model.Report.Image" style="cursor:pointer;" width="300" onclick="window.open('@Url.Content(Model.Report.Image)')" />
                 <br />
             }
         </dd>
@@ -107,8 +107,8 @@
         <a asp-controller="Reports" asp-action="Details" asp-route-id="@Model.ReportId">View Report Details</a>
         @if (Model.User.Id.Equals(user.Id))
         {
-            <a asp-action="Edit" asp-route-id="@Model.InvestigationId">| Add Log |</a>
+            <a asp-action="Edit" asp-route-id="@Model.InvestigationId">| Add Log </a>
         }
     }
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">| Back to List</a>
 </div>

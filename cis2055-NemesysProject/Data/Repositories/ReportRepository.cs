@@ -27,7 +27,7 @@ namespace cis2055_NemesysProject.Data.Repositories
         {
             try
             {
-                return _context.Reports.Include(r => r.Status).Include(r => r.Hazard).Include(r => r.User).OrderBy(r => r.DateOfReport);
+                return _context.Reports.Include(r => r.Status).Include(r => r.Hazard).Include(r => r.User).Include(r => r.Investigation).OrderBy(r => r.DateOfReport);
             }
             catch (Exception ex)
             {
@@ -131,6 +131,17 @@ namespace cis2055_NemesysProject.Data.Repositories
                 if (report.Image != "")
                 {
                     System.IO.File.Delete("wwwroot" + report.Image);
+                }
+                if(report.Investigation != null)
+                {
+                    if(report.Investigation.LogInvestigations != null)
+                    {
+                        foreach (var log in report.Investigation.LogInvestigations)
+                        {
+                            _context.LogInvestigations.Remove(log);
+                        }
+                    }
+                    _context.Investigations.Remove(report.Investigation);
                 }
                 _context.Reports.Remove(report);
                 _context.SaveChanges();

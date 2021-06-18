@@ -8,68 +8,70 @@
 
 <h4>Report</h4>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit" method="post" role="form" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            @*<div class="form-group">
-            <label asp-for="UserId" class="control-label"></label>
-            <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
-        </div>*@
-            <div class="form-group">
-                <label asp-for="HazardId" class="control-label"></label>
-                <select asp-for="HazardId" class="form-control"
-                        asp-items="@(new SelectList(Model.HazardList,"HazardId","HazardType"))">
-                    <option value="">Select a hazard</option>
-                </select>
-                <span asp-validation-for="HazardId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DateTimeHazard" class="control-label">Date and time hazard was spotted</label>
-                <input asp-for="DateTimeHazard" class="form-control" />
-                <span asp-validation-for="DateTimeHazard" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
 
-            <div class="form-group">
-                <label asp-for="ImageToUpload" class="control-label"></label>
-                <input type="file" asp-for="ImageToUpload" class="form-control" />
-                <span asp-validation-for="ImageToUpload" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Latitude" class="control-label"></label>
-                <input asp-for="Latitude" class="form-control" />
-                <span asp-validation-for="Latitude" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Longitude" class="control-label"></label>
-                <input asp-for="Longitude" class="form-control" />
-                <span asp-validation-for="Longitude" class="text-danger"></span>
-            </div>
+<body>
+    <span style="float:right;">Click anywhere on the map to set the location. Right-click to remove the marker</span>
+    <div id="map" style="float:right;"></div>
+    <div class="row">
+        <div class="col-md-8">
+            <form asp-action="Edit" method="post" role="form" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                @*<div class="form-group">
+                        <label asp-for="UserId" class="control-label"></label>
+                        <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
+                    </div>*@
+                <div class="form-group">
+                    <label asp-for="HazardId" class="control-label"></label>
+                    <select asp-for="HazardId" class="form-control"
+                            asp-items="@(new SelectList(Model.HazardList,"HazardId","HazardType"))">
+                        <option value="">Select a hazard</option>
+                    </select>
+                    <span asp-validation-for="HazardId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="DateTimeHazard" class="control-label">Date and time hazard was spotted</label>
+                    <input asp-for="DateTimeHazard" class="form-control" />
+                    <span asp-validation-for="DateTimeHazard" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Title" class="control-label"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Description" class="control-label"></label>
+                    <input asp-for="Description" class="form-control" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
 
-            <div id="map"></div>
+                <div class="form-group">
+                    <label asp-for="ImageToUpload" class="control-label"></label>
+                    <input type="file" asp-for="ImageToUpload" class="form-control" />
+                    <span asp-validation-for="ImageToUpload" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Latitude" class="control-label"></label>
+                    <input asp-for="Latitude" class="form-control" />
+                    <span asp-validation-for="Latitude" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Longitude" class="control-label"></label>
+                    <input asp-for="Longitude" class="form-control" />
+                    <span asp-validation-for="Longitude" class="text-danger"></span>
+                </div>
 
-            <link rel="stylesheet" href="~/css/map.css">
-            <script src="~/js/editReportMap.js"></script>
-            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyChmvdq02aq8Sa68jTYFghQZz_1LFFUp8o&callback=initMap&libraries=&v=weekly"
-                    async></script>
+                <link rel="stylesheet" href="~/css/map.css">
+                <script src="~/js/editReportMap.js"></script>
+                <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyChmvdq02aq8Sa68jTYFghQZz_1LFFUp8o&callback=initMap&libraries=&v=weekly"
+                        async></script>
 
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
     </div>
-</div>
-
+</body>
 <div>
     <a asp-action="Index">Back to List</a>
 </div>

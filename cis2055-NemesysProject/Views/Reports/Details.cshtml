@@ -15,92 +15,95 @@
 <div>
     <h4>Report</h4>
     <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Status.StatusType)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Status.StatusType)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Hazard.HazardType)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Hazard.HazardType)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.DateOfReport)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.DateOfReport)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.DateTimeHazard)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.DateTimeHazard)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Upvotes)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Upvotes)
-        </dd>
-        @if (Model.Image != "")
-        {
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.Image)
+    <body>
+        <div id="map" style="float:right;"></div>
+        <dl class="row">
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(model => model.Status.StatusType)
             </dt>
-            <dd class="col-sm-10">
-                <img src="@Model.Image" width="500" />
+            <dd class="col-sm-12">
+                @Html.DisplayFor(model => model.Status.StatusType)
             </dd>
-        }
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Latitude)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Latitude)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Longitude)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Longitude)
-        </dd>
-        <dt class="col-sm-2">
-            Reporter
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.User.UserName)
-            <br />
-            @Html.DisplayFor(model => model.User.PhoneNumber)
-        </dd>
-        @if (Model.Investigation != null)
-        {
-            <dt class="col-sm-2">
-                Investigation
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(model => model.Hazard.HazardType)
             </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Investigation.Description)
+            <dd class="col-sm-12">
+                @Html.DisplayFor(model => model.Hazard.HazardType)
+            </dd>
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(model => model.DateOfReport)
+            </dt>
+            <dd class="col-sm-12">
+                @Html.DisplayFor(model => model.DateOfReport)
+            </dd>
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(model => model.DateTimeHazard)
+            </dt>
+            <dd class="col-sm-12">
+                @Html.DisplayFor(model => model.DateTimeHazard)
+            </dd>
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(model => model.Title)
+            </dt>
+            <dd class="col-sm-12">
+                @Html.DisplayFor(model => model.Title)
+            </dd>
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+            <dd class="col-sm-12">
+                @Html.DisplayFor(model => model.Description)
+            </dd>
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(model => model.Upvotes)
+            </dt>
+            <dd class="col-sm-12">
+                @Html.DisplayFor(model => model.Upvotes)
+            </dd>
+            @if (Model.Image != "")
+            {
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.Image)
+                </dt>
+                <dd class="col-sm-12">
+                    <img src="@Model.Image" style="cursor:pointer;" width="300" onclick="window.open('@Url.Content(Model.Image)')" />
+                </dd>
+            }
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(model => model.Latitude)
+            </dt>
+            <dd class="col-sm-12">
+                @Html.DisplayFor(model => model.Latitude)
+            </dd>
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(model => model.Longitude)
+            </dt>
+            <dd class="col-sm-12">
+                @Html.DisplayFor(model => model.Longitude)
+            </dd>
+            <dt class="col-sm-4">
+                Reporter
+            </dt>
+            <dd class="col-sm-12">
+                @Html.DisplayFor(model => model.User.UserName)
                 <br />
-                @Html.DisplayFor(model => model.Investigation.User.Email)
+                @Html.DisplayFor(model => model.User.PhoneNumber)
             </dd>
-        }
-    </dl>
+            @if (Model.Investigation != null)
+            {
+                <dt class="col-sm-4">
+                    Investigation
+                </dt>
+                <dd class="col-sm-12">
+                    @Html.DisplayFor(model => model.Investigation.Description)
+                    <br />
+                    @Html.DisplayFor(model => model.Investigation.User.Email)
+                </dd>
+            }
+        </dl>
+    </body>
+
 </div>
-<div id="map"></div>
 <div>
     @if (User.Identity.IsAuthenticated)
     {
@@ -115,7 +118,6 @@
         <a asp-action="Index">Back to List</a>
     }
 </div>
-
 <link rel="stylesheet" href="~/css/map.css">
 <script src="~/js/reportDetailsMap.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyChmvdq02aq8Sa68jTYFghQZz_1LFFUp8o&callback=initMap&libraries=&v=weekly" async onload="initMap('@Model.Latitude', '@Model.Longitude')"></script>
