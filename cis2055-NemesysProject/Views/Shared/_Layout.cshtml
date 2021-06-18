@@ -21,26 +21,14 @@
                         @{
                             if (User.Identity.IsAuthenticated)
                             {
-                                if (User.IsInRole("Admin"))
-                                {
-                                    @*<li class="nav-item">
-                                            <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users Index</a>
-                                        </li>*@
-                                }
-
-                                @*if (User.IsInRole("Admin") || User.IsInRole("Investigator"))
-                                    {*@
+                               
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Investigations" asp-action="Index">Investigations</a>
                                 </li>
 
-                                @*}*@
-
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Reports" asp-action="Index">Reports</a>
                                 </li>
-
-
                               
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="HallofFame" asp-action="Index">Hall of Fame</a>

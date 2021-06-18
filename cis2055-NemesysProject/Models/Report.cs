@@ -11,9 +11,6 @@ namespace cis2055_NemesysProject.Models
     {
         public Report()
         {
-            //Hazards = new HashSet<Hazard>();
-            //Investigations = new HashSet<Investigation>();
-            //ReportHazards = new HashSet<ReportHazard>();
         }
 
         [Key]
@@ -33,14 +30,10 @@ namespace cis2055_NemesysProject.Models
         public int StatusId { get; set; }
         public int HazardId { get; set; }
         public Hazard Hazard { get; set; }
-        //public Investigation Investigation { get; set; }
         public virtual StatusCategory Status { get; set; }
         public string UserId { get; set; }
         [Display(Name = "Reporter")]
         public virtual NemesysUser User { get; set; }
         public virtual Investigation Investigation { get; set; }
-        //public virtual ICollection<Investigation> Investigations { get; set; }
-        //public virtual ICollection<Hazard> Hazards { get; set; }
-        //public virtual ICollection<ReportHazard> ReportHazards { get; set; }
     }
 }

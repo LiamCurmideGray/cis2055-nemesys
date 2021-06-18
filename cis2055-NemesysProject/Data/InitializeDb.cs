@@ -9,10 +9,6 @@ namespace cis2055_NemesysProject.Data
     public class InitializeDb
     {
 
-        //Create methods to intialize user and roles
-
-        //Both should have a default reporter and investigator roles, also an admin role it good too
-
         public static void SeedRoles(RoleManager<IdentityRole> roleManager)
         {
             if(!roleManager.Roles.Any())
@@ -58,14 +54,12 @@ namespace cis2055_NemesysProject.Data
                     NormalizedUserName = "REPORTER@GMAIL.COM",
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true,
-                    SecurityStamp = Guid.NewGuid().ToString("D") //to track important profile updates (e.g. password change)
+                    SecurityStamp = Guid.NewGuid().ToString("D") 
                 };
 
-                //Add to store
                 result = userManager.CreateAsync(reporter, "Reporter123!").Result;
                 if (result.Succeeded)
                 {
-                    //Add to role
                     userManager.AddToRoleAsync(reporter, "Reporter").Wait();
                 }
 
@@ -78,14 +72,12 @@ namespace cis2055_NemesysProject.Data
                     NormalizedUserName = "REPORTER2@GMAIL.COM",
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true,
-                    SecurityStamp = Guid.NewGuid().ToString("D") //to track important profile updates (e.g. password change)
+                    SecurityStamp = Guid.NewGuid().ToString("D") 
                 };
 
-                //Add to store
                 result = userManager.CreateAsync(reporter, "Reporter123!").Result;
                 if (result.Succeeded)
                 {
-                    //Add to role
                     userManager.AddToRoleAsync(reporter, "Reporter").Wait();
                 }
 
@@ -98,14 +90,12 @@ namespace cis2055_NemesysProject.Data
                     NormalizedUserName = "INVESTIGATOR@GMAIL.COM",
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true,
-                    SecurityStamp = Guid.NewGuid().ToString("D") //to track important profile updates (e.g. password change)
+                    SecurityStamp = Guid.NewGuid().ToString("D") 
                 };
 
-                //Add to store
                 result = userManager.CreateAsync(investigator, "Investigator123!").Result;
                 if (result.Succeeded)
                 {
-                    //Add to role
                     userManager.AddToRoleAsync(investigator, "Investigator").Wait();
                 }
 
@@ -118,14 +108,12 @@ namespace cis2055_NemesysProject.Data
                     NormalizedUserName = "INVESTIGATOR2@GMAIL.COM",
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true,
-                    SecurityStamp = Guid.NewGuid().ToString("D") //to track important profile updates (e.g. password change)
+                    SecurityStamp = Guid.NewGuid().ToString("D") 
                 };
 
-                //Add to store
                 result = userManager.CreateAsync(investigator, "Investigator123!").Result;
                 if (result.Succeeded)
                 {
-                    //Add to role
                     userManager.AddToRoleAsync(investigator, "Investigator").Wait();
                 }
             }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using cis2055_NemesysProject.Data.Interfaces;
 using cis2055_NemesysProject.Models;
+using cis2055_NemesysProject.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -78,6 +79,42 @@ namespace cis2055_NemesysProject.Data.Repositories
                 throw;
             }
         }
+
+        public void AddInvestigation(CreateInvestigationViewModel investigationModel)
+        {
+            try
+            {
+                Investigation investigation = new Investigation()
+                {
+                    ReportId = investigationModel.ReportId,
+                    Description = investigationModel.Description,
+                    UserId = investigationModel.UserId
+                };
+
+                _context.Add(investigation);
+                _context.SaveChanges();
+
+                Investigation investigationId = GetInvestigationByReportId(investigationModel.ReportId);
+
+                LogInvestigation logInvestigation = new LogInvestigation()
+                {
+                    InvestigationId = investigationId.InvestigationId,
+                    Description = investigationModel.LogDescription,
+                    DateOfAction = DateTime.UtcNow
+                };
+
+                _context.Add(logInvestigation);
+                _context.SaveChanges();
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+
+        }
+
 
 
         public IEnumerable<LogInvestigation> GetLogsOfInvestigation(int id)

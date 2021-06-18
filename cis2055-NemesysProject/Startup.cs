@@ -87,9 +87,6 @@ namespace cis2055_NemesysProject
             app.UseAuthentication();
             app.UseAuthorization();
 
-            //app.UseMvc();
-            //app.UseSession();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(

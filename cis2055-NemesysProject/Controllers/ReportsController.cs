@@ -207,8 +207,6 @@ namespace cis2055_NemesysProject.Controllers
             }
         }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
         [Authorize(Roles = "Reporter")]
         public IActionResult UpdateUpvote(int id)
         {

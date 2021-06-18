@@ -1,4 +1,5 @@
 ﻿using cis2055_NemesysProject.Models;
+using cis2055_NemesysProject.ViewModel;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,6 @@ namespace cis2055_NemesysProject.Data.Interfaces
         IEnumerable<LogInvestigation> GetLogsOfInvestigation(int id);
         Investigation GetInvestigationByReportId(int id);
 
-
+        public void AddInvestigation(CreateInvestigationViewModel investigationModel);
     }
 }

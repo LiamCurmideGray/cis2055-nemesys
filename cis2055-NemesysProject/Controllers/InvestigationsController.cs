@@ -37,7 +37,6 @@ namespace cis2055_NemesysProject.Controllers
         // GET: Investigations
         public IActionResult Index()
         {
-            //var cis2055nemesysContext = _context.Investigations.Include(i => i.Report).Include(i => i.User);
             var model = new InvestigationListViewModel()
             {
                 TotalInvestigations = _investigationRepository.GetAllInvestigations().Count(),
@@ -60,7 +59,6 @@ namespace cis2055_NemesysProject.Controllers
             if (investigation == null)
             {
                 return RedirectToAction(nameof(Index));
-                //nneds report user, report hazard, report status
             }
 
             return View(investigation);
@@ -103,35 +101,13 @@ namespace cis2055_NemesysProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                var reportInvestigation = _context.Investigations.FirstOrDefault(i => i.ReportId == id);
+                var reportInvestigation = _investigationRepository.GetInvestigationByReportId(id);
                 var report = _reportRepository.GetReportById(id);
-                //var currUser = _userManager.GetUserAsync(User);
                 if (reportInvestigation == null)
                 {
-                    var newInvestigation = new Investigation()
-                    {
-                        ReportId = id,
-                        Description = investigation.Description,
-                        UserId = _userManager.GetUserId(User),
-                        //Report = report,
-
-                    };
-
-                    report.StatusId = investigation.StatusId;
-                    _context.Add(newInvestigation);
-                    _context.SaveChanges();
-
-                    Investigation investigationId = _context.Investigations.FirstOrDefault(i => i.ReportId == id);
-                    LogInvestigation logInvestigation = new LogInvestigation()
-                    {
-                        InvestigationId = investigationId.InvestigationId,
-                        Description = investigation.LogDescription,
-                        DateOfAction = DateTime.Now
-                    };
-
-                    _context.Add(logInvestigation);
-                    _context.SaveChanges();
-
+                    investigation.ReportId = report.ReportId;
+                    investigation.UserId = _userManager.GetUserId(User);
+                    _investigationRepository.AddInvestigation(investigation);
 
                     return RedirectToAction(nameof(Index));
                 }
@@ -143,7 +119,7 @@ namespace cis2055_NemesysProject.Controllers
             }
             else
             {
-                var statusList = _context.StatusCategories.ToList();
+                var statusList = _reportRepository.GetAllStatusCategories().ToList();
 
                 var model = new CreateInvestigationViewModel()
                 {
@@ -195,10 +171,7 @@ namespace cis2055_NemesysProject.Controllers
         [Authorize(Roles = "Investigator")]
         public async Task<IActionResult> Edit(int id, [Bind("StatusId,Description,LogDescription")] CreateInvestigationViewModel investigation)
         {
-            //if (id != investigation.InvestigationId)
-            //{
-            //    return NotFound();
-            //}
+          
             var inv = _investigationRepository.GetInvestigationById(id);
             var reportId = inv.ReportId;
             var report = _reportRepository.GetReportById(reportId);
@@ -214,11 +187,6 @@ namespace cis2055_NemesysProject.Controllers
                         report.StatusId = investigation.StatusId;
                         _context.Update(inv);
                         _context.Update(report);
-
-                        //string datenow = DateTime.Now.ToString();
-                        ////var dateTime = DateTime.Parse(datenow);
-                        //int minute = DateTime.Now.Minute;
-                        //int hour = DateTime.Now.Hour;
 
                         LogInvestigation log = new LogInvestigation()
                         {

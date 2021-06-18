@@ -17,14 +17,8 @@ namespace cis2055_NemesysProject.Data
         public virtual DbSet<Hazard> Hazards { get; set; }
         public virtual DbSet<Investigation> Investigations { get; set; }
         public virtual DbSet<LogInvestigation> LogInvestigations { get; set; }
-        //public virtual DbSet<Pinpoint> Pinpoints { get; set; }
         public virtual DbSet<Report> Reports { get; set; }
-        //public virtual DbSet<ReportHazard> ReportHazards { get; set; }
-        //public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<StatusCategory> StatusCategories { get; set; }
-        //public virtual DbSet<User> Users { get; set; }
-
-
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
