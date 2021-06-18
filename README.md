@@ -25,7 +25,7 @@ Upon cloning the repository create a new appsettings.json file and within it wri
 3. You are now able to running the web application!
 
 To login with the pre-initialized accounts use either:
-Email: reporter@gmail.com , investigator@gmail.com
-Password: Reporter123!. Investigator123!
+ - Email: reporter@gmail.com , investigator@gmail.com
+ -  Password: Reporter123!. Investigator123!
 
 OR you can register ones yourself as you interact with the web application.
