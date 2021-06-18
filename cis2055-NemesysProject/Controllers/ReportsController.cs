@@ -69,6 +69,7 @@ namespace cis2055_NemesysProject.Controllers
         [Authorize(Roles = "Reporter")]
         public IActionResult Create()
         {
+            
             var model = new CreateReportViewModel()
             {
                 HazardList = _reportRepository.GetAllHazard()

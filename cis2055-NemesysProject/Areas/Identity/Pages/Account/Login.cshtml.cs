@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text;
 
 namespace cis2055_NemesysProject.Areas.Identity.Pages.Account
 {
@@ -99,7 +101,26 @@ namespace cis2055_NemesysProject.Areas.Identity.Pages.Account
                 }
                 else
                 {
+                    NemesysUser user = await _userManager.FindByEmailAsync(Input.Email);
+
+                    if (user != null)
+                    {
+                    bool emailconfirmed = await _userManager.IsEmailConfirmedAsync(user);
+
+                        if(!emailconfirmed)
+                        {
+                            ModelState.AddModelError(string.Empty, "You've already Register,  you need to confirm your email first");
+
+                            return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                        }
+
+                    } else
+                    {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+
+                    }
+
+                    
                     return Page();
                 }
             }
