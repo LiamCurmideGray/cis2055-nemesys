@@ -162,7 +162,8 @@ namespace cis2055_NemesysProject.Controllers
             }
             else
             {
-                return Unauthorized();
+                report.HazardList  = _reportRepository.GetAllHazard();
+                return View(report);
             }
         }
 
