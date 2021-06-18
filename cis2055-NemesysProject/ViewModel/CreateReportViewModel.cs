@@ -31,10 +31,9 @@ namespace cis2055_NemesysProject.ViewModel
         [DataType(DataType.Upload)]
         [Display(Name = "Hazard Image")]
         public IFormFile ImageToUpload { get; set; }
-        [Required (ErrorMessage = "Please place a marker on the map or input latitude")]
+        [Required (ErrorMessage = "Please place a marker on the map")]
         [Range (-90, 90, ErrorMessage = "Latitude has to be between -90 and 90")]
         public double? Latitude { get; set; }
-        [Required(ErrorMessage = "Please place a marker on the map or input longitude")]
         [Range(-180, 180, ErrorMessage = "Longitude has to be between -180 and 180")]
         public double? Longitude { get; set; }
 

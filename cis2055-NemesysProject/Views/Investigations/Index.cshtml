@@ -46,12 +46,12 @@
                 <td>
                     @if (userId == item.User.Id)
                     {
-                        <a asp-action="Edit" asp-route-id="@item.InvestigationId">Add Log </a>
+                        <a asp-action="Edit" asp-route-id="@item.InvestigationId">Add Log |</a>
                     }
-                    <a asp-action="Details" asp-route-id="@item.InvestigationId">| Details |</a>
+                    <a asp-action="Details" asp-route-id="@item.InvestigationId">Details</a>
                     @if (userId == item.User.Id)
                     {
-                        <a asp-action="Delete" asp-route-id="@item.InvestigationId">Delete</a>
+                        <a asp-action="Delete" asp-route-id="@item.InvestigationId">| Delete</a>
                     }
                     </td>
             </tr>

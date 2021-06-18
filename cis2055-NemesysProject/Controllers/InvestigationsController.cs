@@ -70,7 +70,7 @@ namespace cis2055_NemesysProject.Controllers
         // GET: Investigations/Create
         public IActionResult Create(int id)
         {
-           
+            
             var reportInvestigation = _investigationRepository.GetInvestigationByReportId(id);
             if (reportInvestigation == null)
             {
@@ -82,7 +82,7 @@ namespace cis2055_NemesysProject.Controllers
                     StatusId = 3,
                     StatusList = statusList,
                     User = _userManager.GetUserAsync(User).Result,
-
+                    ReportTitle = _reportRepository.GetReportById(id).Title
                 };
                 return View(model);
             }
@@ -250,7 +250,9 @@ namespace cis2055_NemesysProject.Controllers
             }
             else
             {
+                var refreshInv = _investigationRepository.GetInvestigationById(id);
                 var statusList = _context.StatusCategories.ToList();
+                var loginvestigation = _investigationRepository.GetLogsOfInvestigation(refreshInv.InvestigationId);
 
                 var model = new CreateInvestigationViewModel()
                 {
@@ -258,6 +260,7 @@ namespace cis2055_NemesysProject.Controllers
                     StatusId = inv.Report.StatusId,
                     StatusList = statusList,
                     Description = inv.Description,
+                    LogInvestigation = loginvestigation
                 };
                 return View(model);
             }

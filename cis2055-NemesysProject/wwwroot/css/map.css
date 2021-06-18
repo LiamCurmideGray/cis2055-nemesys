@@ -1,6 +1,12 @@
 ﻿#map {
     height: 550px;
-    width: 800px;
+    width: 600px;
     margin: auto;
     padding: 20px;
+}
+
+.indexMap {
+    height: 100px;
+    width: 100px;
+
 }
